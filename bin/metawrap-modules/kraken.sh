@@ -55,6 +55,7 @@ esac
 
 source $config_file
 
+echo "Running kraken.sh ......."
 echo "**Sourced config-metawrap from: $config_file**"
 
 # Set defaults
@@ -69,6 +70,7 @@ if [ $? -ne 0 ]; then help_message; exit 1; fi
 # loop through input params
 while true; do
 	case "$1" in
+		--config-metawrap) shift 2;;
 		-t) threads=$2; shift 2;;
 		-o) out=$2; shift 2;;
 		-s) depth=$2; shift 2;;

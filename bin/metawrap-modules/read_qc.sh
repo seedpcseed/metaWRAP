@@ -52,6 +52,7 @@ esac
 
 source $config_file
 
+echo "Running read_qc.sh....................."
 echo "**Sourced config-metawrap from: $config_file**"
 
 
@@ -68,6 +69,7 @@ if [ $? -ne 0 ]; then help_message; exit 1; fi
 # loop through input params
 while true; do
 	case "$1" in
+		--config-metawrap) shift 2;;
 		-t) threads=$2; shift 2;;
 		-o) out=$2; shift 2;;
 		-1) reads_1=$2; shift 2;;
