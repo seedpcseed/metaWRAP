@@ -4,12 +4,12 @@
 #
 # This script is meant to be a comprehensive solution for producing the best metagenomic assembly given paired end reads from one or more samples.
 # Ideally it should take in fully QC'd reads. First, the reads are assembled with metaSPAdes3.10, then all the reads that did not map back to the
-# contigs are re-assembled with MEGAHIT (which works better on lower coverage contigs. The resulting assemblies are combined, sorted, and short 
+# contigs are re-assembled with MEGAHIT (which works better on lower coverage contigs. The resulting assemblies are combined, sorted, and short
 # contigs are removed. The finall assembly is then QCed by QUAST.
 #
 # Author of pipeline: German Uritskiy. I do not have any authorship of the many programs this pipeline uses.
 # For questions, bugs, and suggestions, contact me at guritsk1@jhu.edu.
-# 
+#
 ##############################################################################################################################################################
 
 
@@ -20,7 +20,7 @@ help_message () {
 	echo "Options:"
 	echo ""
 	echo "	-1 STR          forward fastq reads"
-	echo "	-2 STR          reverse fastq reads" 
+	echo "	-2 STR          reverse fastq reads"
 	echo "	-o STR          output directory"
 	echo "	-m INT          memory in GB (default=24)"
 	echo "	-t INT          number of threads (defualt=1)"
@@ -42,8 +42,21 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
 
 # setting scripts and databases from config file (should be in same folder as main script)
-config_file=$(which config-metawrap)
+case "$1" in
+        --config-metawrap)
+        export config_file=$2
+        echo "Config_file now set as: $config_file"
+        shift 2
+        ;;
+        *)
+        export config_file=$(which config-metawrap)
+        echo "Using config-metawrap file in container: $config_file"
+        ;;
+esac
+
 source $config_file
+
+echo "**Sourced config-metawrap from: $config_file**"
 
 # default params
 mem=24; threads=1; out="false"; reads_1="false"; reads_2="false"; min_len=1000
@@ -79,7 +92,7 @@ done
 ########################################################################################################
 
 # check if all parameters are entered
-if [ "$out" = "false" ] || [ "$reads_1" = "false" ] || [ "$reads_2" = "false" ] || [ "$threads" = "false" ] || [ "$mem" = "false" ]; then 
+if [ "$out" = "false" ] || [ "$reads_1" = "false" ] || [ "$reads_2" = "false" ] || [ "$threads" = "false" ] || [ "$mem" = "false" ]; then
 	help_message; exit 1
 fi
 
@@ -105,10 +118,10 @@ if [ "$metaspades_assemble" = true ]; then
 	########################               ASSEMBLING WITH METASPADES               ########################
 	########################################################################################################
         announcement "ASSEMBLING WITH METASPADES"
-	
+
 	comm "Using reads $reads_1 and $reads_2 for assembly,"
 	if [ ! -f "$reads_1" ] || [ ! -f "$reads_2" ]; then error "Read files $reads_1 and/or $reads_2 dont exist. Exiting."; fi
-	
+
 	mkdir ${out}/metaspades.tmp
 
 	if [[ -s ${out}/metaspades/spades.log ]]; then
@@ -135,12 +148,12 @@ if [ "$megahit_assemble" = true ] && [ "$metaspades_assemble" = true ]; then
 
 
 	bwa index ${out}/metaspades/long_scaffolds.fasta
-	
+
 	#sort out and store reads that dont map back to the assembly:
 	bwa mem -t $threads ${out}/metaspades/long_scaffolds.fasta $reads_1 $reads_2 | grep -v NM:i: > ${out}/unused_by_metaspades.sam
 	${SOFT}/sam_to_fastq.py ${out}/unused_by_metaspades.sam > ${out}/unused_by_metaspades.fastq
 	rm ${out}/unused_by_metaspades.sam
-	
+
 	if [[ ! -s ${out}/unused_by_metaspades.fastq ]]; then error "Something went wrong with pulling out unassembled reads. Exiting."; fi
 fi
 
@@ -149,7 +162,7 @@ if [ "$megahit_assemble" = true ]; then
 	########################        ASSEMBLING REMAINDER READS WITH MEGAHIT         ########################
 	########################################################################################################
         announcement "ASSEMBLING READS WITH MEGAHIT"
-	
+
 	#rm -r ${out}/megahit
 	mkdir ${out}/megahit.tmp
 	if [ "$metaspades_assemble" = true ]; then
@@ -184,7 +197,7 @@ announcement "FORMAT THE ASSEMBLY"
 if [ "$megahit_assemble" = true ] && [ "$metaspades_assemble" = true ]; then
 	comm "Reads were assembled with metaspades AND megahit"
 	${SOFT}/fix_megahit_contig_naming.py ${out}/megahit/final.contigs.fa $min_len > ${out}/megahit/long.contigs.fa
-	
+
 	cp ${out}/metaspades/long_scaffolds.fasta ${out}/combined_assembly.fasta
 	cat ${out}/megahit/long.contigs.fa >> ${out}/combined_assembly.fasta
 	${SOFT}/sort_contigs.py ${out}/combined_assembly.fasta > ${out}/final_assembly.fasta
@@ -193,7 +206,7 @@ elif [ "$metaspades_assemble" = true ]; then
 	comm "Reads were assembled with metaspades"
 	${SOFT}/rm_short_contigs.py $min_len ${out}/metaspades/scaffolds.fasta > ${out}/final_assembly.fasta
 	if [ ! -s ${out}/final_assembly.fasta ]; then error "metaspades failed to produce long contigs (>500bp). Exiting."; fi
-elif [ "$megahit_assemble" = true ]; then 
+elif [ "$megahit_assemble" = true ]; then
 	comm "Reads were assembled with megahit. Formatting and sorting the assembly..."
 	${SOFT}/fix_megahit_contig_naming.py ${out}/megahit/final.contigs.fa $min_len > ${out}/final_assembly.fasta
 	if [[ $? -ne 0 ]]; then error "something went wrong with formating and sorting the assembly. Exiting..."; fi
@@ -218,4 +231,3 @@ if [[ ! -s ${out}/assembly_report.html ]]; then error "Something went wrong with
 ########################      ASSEMBLY PIPELINE COMPLETED SUCCESSFULLY!!!       ########################
 ########################################################################################################
 announcement "ASSEMBLY PIPELINE COMPLETED SUCCESSFULLY!!!"
-

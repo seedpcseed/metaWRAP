@@ -2,12 +2,12 @@
 
 ##############################################################################################################################################################
 #
-# This script takes in a set of bins and any number of paired-end read sets from metagenomic samples, and estimates the abundance of each bin in each 
+# This script takes in a set of bins and any number of paired-end read sets from metagenomic samples, and estimates the abundance of each bin in each
 # sample with salmon. It then uses Seaborn to make clustered heatmaps genome abundances.
 #
 # Author of pipeline: German Uritskiy. I do not clain any authorship of the many programs this pipeline uses.
 # For questions, bugs, and suggestions, contact me at guritsk1@jhu.edu.
-# 
+#
 ##############################################################################################################################################################
 
 
@@ -36,8 +36,21 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
 
 # setting scripts and databases from config file (should be in same folder as main script)
-config_file=$(which config-metawrap)
+case "$1" in
+        --config-metawrap)
+        export config_file=$2
+        echo "Config_file now set as: $config_file"
+        shift 2
+        ;;
+        *)
+        export config_file=$(which config-metawrap)
+        echo "Using config-metawrap file in container: $config_file"
+        ;;
+esac
+
 source $config_file
+
+echo "**Sourced config-metawrap from: $config_file**"
 
 
 # default params
@@ -68,7 +81,7 @@ done
 ########################################################################################################
 
 # check if all parameters are entered
-if [ $out = false ] || [ $bin_folder = false ]; then 
+if [ $out = false ] || [ $bin_folder = false ]; then
 	comm "Non-optional parameters -b and -o were not entered"
 	help_message; exit 1
 fi
@@ -190,7 +203,7 @@ if [[ $n -gt 1 ]]; then
 	if [[ $? -ne 0 ]]; then error "something went wrong with making the heatmap. Exiting..."; fi
 
 	comm "cleaning up..."
-	rm -r ${out}/alignment_files/ 
+	rm -r ${out}/alignment_files/
 else
 	warning "Cannot make clustered heatmap with just one sample... Skipping heatmap"
 fi
@@ -199,4 +212,3 @@ fi
 ########################     QUANT_BINS PIPELINE SUCCESSFULLY FINISHED!!!       ########################
 ########################################################################################################
 announcement "QUANT_BINS PIPELINE SUCCESSFULLY FINISHED!!!"
-

@@ -6,7 +6,7 @@
 #
 # Author of pipeline: German Uritskiy. I do not clain any authorship of the many programs this pipeline uses.
 # For questions, bugs, and suggestions, contact me at guritsk1@jhu.edu.
-# 
+#
 ##############################################################################################################################################################
 
 
@@ -34,8 +34,21 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
 
 # setting scripts and databases from config file (should be in same folder as main script)
-config_file=$(which config-metawrap)
+case "$1" in
+        --config-metawrap)
+        export config_file=$2
+        echo "Config_file now set as: $config_file"
+        shift 2
+        ;;
+        *)
+        export config_file=$(which config-metawrap)
+        echo "Using config-metawrap file in container: $config_file"
+        ;;
+esac
+
 source $config_file
+
+echo "**Sourced config-metawrap from: $config_file**"
 
 # default params
 threads=1; bins=None; out=None
@@ -63,7 +76,7 @@ done
 ########################################################################################################
 
 # check if all parameters are entered
-if [ $out = "None" ] || [ $bins = "None" ]; then 
+if [ $out = "None" ] || [ $bins = "None" ]; then
 	comm "Some non-optional parameters were not entered"
 	help_message; exit 1
 fi
@@ -160,4 +173,3 @@ warning "Your contigs may be truncated in the annotation because they are too lo
 ########################    ANNOTATION PIPELINE SUCCESSFULLY FINISHED!!!        ########################
 ########################################################################################################
 announcement "ANNOTATE BINS PIPELINE SUCCESSFULLY FINISHED!!!"
-

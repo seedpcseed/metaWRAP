@@ -6,7 +6,7 @@
 #
 # Author of pipeline: German Uritskiy. I do not clain any authorship of the many programs this pipeline uses.
 # For questions, bugs, and suggestions, contact me at guritsk1@jhu.edu.
-# 
+#
 ##############################################################################################################################################################
 
 
@@ -52,7 +52,7 @@ run_with_lock(){
     local x
     read -u 3 -n 3 x && ((0==x)) || exit $x
     (
-    "$@" 
+    "$@"
     printf '%.3d' $? >&3
     )&
 }
@@ -63,8 +63,21 @@ run_with_lock(){
 
 
 # setting scripts and databases from config file (should be in same folder as main script)
-config_file=$(which config-metawrap)
+case "$1" in
+        --config-metawrap)
+        export config_file=$2
+        echo "Config_file now set as: $config_file"
+        shift 2
+        ;;
+        *)
+        export config_file=$(which config-metawrap)
+        echo "Using config-metawrap file in container: $config_file"
+        ;;
+esac
+
 source $config_file
+
+echo "**Sourced config-metawrap from: $config_file**"
 
 
 # default params
@@ -106,7 +119,7 @@ done
 ########################################################################################################
 
 # check if all parameters are entered
-if [ $out = None ] || [  $bins = None ] || [ $f_reads = None ] || [ $r_reads = None ] ; then 
+if [ $out = None ] || [  $bins = None ] || [ $f_reads = None ] || [ $r_reads = None ] ; then
 	comm "Some non-optional parameters were not entered"
 	help_message; exit 1
 fi
@@ -183,10 +196,10 @@ assemble () {
 		-1 ${out}/reads_for_reassembly/${1%_*}_1.fastq \
 		-2 ${out}/reads_for_reassembly/${1%_*}_2.fastq \
 		-o ${out}/reassemblies/${bin_name}
-		
+
 		if [[ ! -s ${out}/reassemblies/${bin_name}/scaffolds.fasta ]]; then
 	                warning "Something went wrong with reassembling ${bin_name}"
-		else 
+		else
 			comm "${bin_name} was reassembled successfully!"
 			rm -r $tmp_dir
 		fi
@@ -196,7 +209,7 @@ assemble () {
 
 if [ "$run_parallel" = true ]; then
 	open_sem $threads
-	for i in $(ls ${out}/reads_for_reassembly/ | grep _1.fastq); do 
+	for i in $(ls ${out}/reads_for_reassembly/ | grep _1.fastq); do
 		run_with_lock assemble $i 1
 	done
 
@@ -221,7 +234,7 @@ mkdir ${out}/reassembled_bins
 for i in $( ls ${out}/reassemblies/ ); do
 	spades_folder=${out}/reassemblies/$i
 	bin_name=${spades_folder##*/}
-	
+
 	#remove shortest contigs (probably artifacts...)
 	if [ -s ${out}/reassemblies/${bin_name}/scaffolds.fasta ]; then
 		${SOFT}/rm_short_contigs.py $len\
@@ -265,7 +278,7 @@ if [ "$run_checkm" = true ]; then
 	comm "There is $mem RAM and $threads threads available, and each pplacer thread uses ~40GB, so I will use $p_threads threads for pplacer"
 
 	# copy over original bins
-	for base in $( ls ${out}/original_bins/ | grep "\.fa$" ); do 
+	for base in $( ls ${out}/original_bins/ | grep "\.fa$" ); do
 		i=${out}/original_bins/$base
 		cp $i ${out}/reassembled_bins/${base%.*}.orig.fa
 	done
@@ -286,18 +299,18 @@ if [ "$run_checkm" = true ]; then
 	announcement "FINDING THE BEST VERSION OF EACH BIN"
 
 	if [ ! -d ${out}/reassembled_best_bins ]; then mkdir ${out}/reassembled_best_bins; fi
-	for i in $(${SOFT}/choose_best_bin.py ${out}/reassembled_bins.stats $comp $cont); do 
+	for i in $(${SOFT}/choose_best_bin.py ${out}/reassembled_bins.stats $comp $cont); do
 		echo "Copying best bin: $i"
-		cp ${out}/reassembled_bins/${i}.fa ${out}/reassembled_best_bins 
+		cp ${out}/reassembled_bins/${i}.fa ${out}/reassembled_best_bins
 	done
-	
+
 	o=$(ls -l ${out}/reassembled_best_bins | grep orig | wc -l)
 	s=$(ls -l ${out}/reassembled_best_bins | grep strict | wc -l)
 	p=$(ls -l ${out}/reassembled_best_bins | grep permissive | wc -l)
 
 	announcement "Reassembly results are in! $s bins were improved with 'strict' reassembly, $p bins were improved with 'permissive' reassembly, and $o bins were not improved by any reassembly, and thus will stay the same."
-	
-	if [[ $(ls ${out}/reassembled_best_bins | wc -l) -gt 0 ]]; then 
+
+	if [[ $(ls ${out}/reassembled_best_bins | wc -l) -gt 0 ]]; then
 		comm "Seems that the reassembly went well. You will find the final, best, reassembled bins in ${out}/reassembled_bins, and all intermediate files in ${out}/work_files (which we recomend you delete to save space after you confirm that the pipeline worked)"
 		mkdir ${out}/work_files
 		mv ${out}/reassembled_bins ${out}/work_files/
@@ -307,7 +320,7 @@ if [ "$run_checkm" = true ]; then
 		mv ${out}/binned_assembly ${out}/work_files/
 		mv ${out}/reassemblies ${out}/work_files/
 		#rm -r ${out}/original_bins
-		mv ${out}/reassembled_best_bins ${out}/reassembled_bins 
+		mv ${out}/reassembled_best_bins ${out}/reassembled_bins
 	else
 		error "there are no good bins found in ${out}/reassembled_best_bins - something went wrong with choosing the best bins between the reassemblies."
 	fi
@@ -328,7 +341,7 @@ if [ "$run_checkm" = true ]; then
         if [[ ! -s ${out}/reassembled_bins.plot/bin_qa_plot.png ]]; then warning "Something went wrong with making the CheckM plot. Exiting."; fi
         mv ${out}/reassembled_bins.plot/bin_qa_plot.png ${out}/reassembled_bins.png
         rm -r ${out}/reassembled_bins.plot
-	
+
 	comm "you will find the info on the final reassembled bins in ${out}/reassembled_bins.stats, and a figure summarizing it in ${out}/reassembled_bins.png"
 
 	comm "making reassembly N50, compleiton, and contamination summary plots."
@@ -343,4 +356,3 @@ comm "you will find the final bins in ${out}/reassembled_bins"
 ########################    REASSEMBLY PIPELINE SUCCESSFULLY FINISHED!!!        ########################
 ########################################################################################################
 announcement "BIN REASSEMBLY PIPELINE SUCCESSFULLY FINISHED!!!"
-

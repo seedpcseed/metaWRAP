@@ -15,7 +15,7 @@ help_message () {
 	echo "Options:"
 	echo ""
 	echo "	-1 STR          forward fastq reads"
-	echo "	-2 STR          reverse fastq reads" 
+	echo "	-2 STR          reverse fastq reads"
 	echo "	-o STR          output directory"
 	echo "	-t INT          number of threads (default=1)"
 	echo "	-x STR		prefix of host index in bmtagger database folder (default=hg38)"
@@ -38,8 +38,21 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
 
 # setting scripts and databases from config file (should be in same folder as main script)
-config_file=$(which config-metawrap)
+case "$1" in
+        --config-metawrap)
+        export config_file=$2
+        echo "Config_file now set as: $config_file"
+        shift 2
+        ;;
+        *)
+        export config_file=$(which config-metawrap)
+        echo "Using config-metawrap file in container: $config_file"
+        ;;
+esac
+
 source $config_file
+
+echo "**Sourced config-metawrap from: $config_file**"
 
 
 # default params
@@ -76,7 +89,7 @@ done
 ########################################################################################################
 
 # check if all parameters are entered
-if [ "$out" = "false" ] || [ "$reads_1" = "false" ] || [ "$reads_2" = "false" ]; then 
+if [ "$out" = "false" ] || [ "$reads_1" = "false" ] || [ "$reads_2" = "false" ]; then
 	help_message; exit 1
 fi
 
@@ -112,10 +125,10 @@ if [ "$pre_qc_report" = true ]; then
 	########################                 MAKING PRE-QC REPORT                   ########################
 	########################################################################################################
         announcement "MAKING PRE-QC REPORT"
-	
+
 	mkdir ${out}/pre-QC_report
 	fastqc -q -t $threads -o ${out}/pre-QC_report -f fastq $reads_1 $reads_2
-	
+
 	if [ $? -ne 0 ]; then error "Something went wrong with making pre-QC fastqc report. Exiting."; fi
 	rm ${out}/pre-QC_report/*zip
 	comm "pre-qc report saved to: ${out}/pre-QC_report"
@@ -128,18 +141,18 @@ if [ "$trim" = true ]; then
         announcement "RUNNING TRIM-GALORE"
 
 	trim_galore --no_report_file --paired -o $out $reads_1 $reads_2
-	
+
 	tmp=${reads_1%_*}; sample=${tmp##*/}
-	
+
 	# Fix the naming of the trimmed reads files:
 	mv ${out}/${sample}_1_val_1.fq ${out}/trimmed_1.fastq
 	mv ${out}/${sample}_2_val_2.fq ${out}/trimmed_2.fastq
 	if [[ ! -s ${out}/trimmed_1.fastq ]]; then error "Something went wrong with trimming the reads. Exiting."; fi
 	comm "Trimmed reads saved to: ${out}/trimmed_1.fastq and ${out}/trimmed_2.fastq"
-	
+
 	reads_1=${out}/trimmed_1.fastq
 	reads_2=${out}/trimmed_2.fastq
-	
+
 	rm ${out}/${sample}_1_trimmed.fq ${out}/${sample}_2_trimmed.fq
 fi
 
@@ -161,7 +174,7 @@ if [ "$bmtagger" = true ]; then
 	comm "Now sorting out found human reads from the main fastq files..."
 	${SOFT}/skip_human_reads.py ${out}/${sample}.bmtagger.list $reads_1 > ${out}/${sample}_1.clean.fastq
 	${SOFT}/skip_human_reads.py ${out}/${sample}.bmtagger.list $reads_2 > ${out}/${sample}_2.clean.fastq
-	
+
 	comm "Now sorting out found human reads and putting them into a new file... for science..."
 	${SOFT}/select_human_reads.py ${out}/${sample}.bmtagger.list $reads_1 > ${out}/host_reads_1.fastq
 	${SOFT}/select_human_reads.py ${out}/${sample}.bmtagger.list $reads_2 > ${out}/host_reads_2.fastq
@@ -173,7 +186,7 @@ if [ "$bmtagger" = true ]; then
 	reads_2=${out}/${sample}_2.clean.fastq
 
 	rm ${out}/trimmed_1.fastq ${out}/trimmed_2.fastq
-fi	
+fi
 
 mv $reads_1 ${out}/final_pure_reads_1.fastq
 mv $reads_2 ${out}/final_pure_reads_2.fastq
@@ -185,10 +198,10 @@ if [ "$post_qc_report" = true ]; then
 	########################                 MAKING POST-QC REPORT                  ########################
 	########################################################################################################
         announcement "MAKING POST-QC REPORT"
-	
+
 	mkdir ${out}/post-QC_report
 	fastqc -t $threads -o ${out}/post-QC_report -f fastq ${out}/final_pure_reads_1.fastq and ${out}/final_pure_reads_2.fastq
-	
+
 	if [ $? -ne 0 ]; then error "Something went wrong with making post-QC fastqc report. Exiting."; fi
 	rm ${out}/post-QC_report/*zip
 	comm "post-qc report saved to: ${out}/post-QC_report"
@@ -198,10 +211,3 @@ fi
 ########################              READ QC PIPELINE COMPLETE!!!              ########################
 ########################################################################################################
 announcement "READ QC PIPELINE COMPLETE!!!"
-
-
-
-
-
-
-

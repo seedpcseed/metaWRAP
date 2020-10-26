@@ -7,7 +7,7 @@
 # likely path.
 #
 # For questions, bugs, and suggestions, contact German Uritskiy at guritsk1@jhu.edu.
-# 
+#
 ##############################################################################################################################################################
 
 
@@ -35,8 +35,21 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
 
 # setting scripts and databases from config file (should be in same folder as main script)
-config_file=$(which config-metawrap)
+case "$1" in
+        --config-metawrap)
+        export config_file=$2
+        echo "Config_file now set as: $config_file"
+        shift 2
+        ;;
+        *)
+        export config_file=$(which config-metawrap)
+        echo "Using config-metawrap file in container: $config_file"
+        ;;
+esac
+
 source $config_file
+
+echo "**Sourced config-metawrap from: $config_file**"
 
 
 # Set defaults
@@ -66,7 +79,7 @@ done
 ########################################################################################################
 
 # check if all parameters are entered
-if [ "$out" = "false" ] || [ "$bin_folder" = "false" ]; then 
+if [ "$out" = "false" ] || [ "$bin_folder" = "false" ]; then
 	help_message; exit 1
 fi
 
@@ -113,7 +126,7 @@ for f in $(ls $bin_folder); do cat ${bin_folder}/${f} >> ${out}/all_contigs.fa; 
 if [[ ! -s ${out}/all_contigs.fa ]]; then error "something went wrong with joining files in $bin_folder into ${out}/all_contigs.fa"; fi
 
 
-if [[ -s ${out}/megablast_out.raw.tab ]]; then 
+if [[ -s ${out}/megablast_out.raw.tab ]]; then
 	comm "megablast alignment already done. Skipping..."
 else
 	comm "aligning ${out}/all_contigs.fa to ${BLASTDB} database with MEGABLAST. This is the longest step - please be patient. You may look at the classification progress in ${out}/megablast_out.raw.tab"
@@ -173,7 +186,7 @@ comm "you will find the consensus taxonomy of each bin in ${out}/bin_taxonomy.ta
 if false; then
 comm "renaming bins to their best taxonomy"
 mkdir ${out}/renamed_bins
-for bin in $(ls $bin_folder); do 
+for bin in $(ls $bin_folder); do
 	tax=$(cat ${out}/bin_taxonomy.tab | awk -v bin=$bin '$1==bin' | cut -f2)
 	best_tax=$(echo $tax | rev | cut -d';' -f1 | rev | cut -d'_' -f1)
 	no_spaces=${best_tax// /_}
@@ -196,4 +209,3 @@ fi
 ########################    CLASSIFICATION PIPELINE FINISHED SUCCESSFULLY!!!    ########################
 ########################################################################################################
 announcement "BIN CLASSIFICATION PIPELINE FINISHED SUCCESSFULLY!!!"
-

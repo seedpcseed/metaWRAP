@@ -4,15 +4,15 @@
 #
 # This script is meant to be run on the outputs of assembly.sh pipeline to split the assembly contigs into metagenomic bins.
 # Ideally it should take in the assembly file of all of your samples, followed by the reads of all the samples that went into the assembly.
-# The more samples, the better the binning. 
+# The more samples, the better the binning.
 #
 # The script uses metaBAT2 and/or CONCOCT and/or MaxBin2 to bin the contigs. MetaBAT2 is the defualt due to its speed and great performance,
-# but all these binners have their advantages and disadvantages, so it recomended to run the bin_refinement module to QC the bins, get the 
-# best bins of all of each method, and to reassembly and refine the final bins. 
+# but all these binners have their advantages and disadvantages, so it recomended to run the bin_refinement module to QC the bins, get the
+# best bins of all of each method, and to reassembly and refine the final bins.
 #
 # Author of pipeline: German Uritskiy. I do not clain any authorship of the many programs this pipeline uses.
 # For questions, bugs, and suggestions, contact me at guritsk1@jhu.edu.
-# 
+#
 ##############################################################################################################################################################
 
 
@@ -76,8 +76,21 @@ run_checkm () {
 
 
 # setting scripts and databases from config file (should be in same folder as main script)
-config_file=$(which config-metawrap)
+case "$1" in
+        --config-metawrap)
+        export config_file=$2
+        echo "Config_file now set as: $config_file"
+        shift 2
+        ;;
+        *)
+        export config_file=$(which config-metawrap)
+        echo "Using config-metawrap file in container: $config_file"
+        ;;
+esac
+
 source $config_file
+
+echo "**Sourced config-metawrap from: $config_file**"
 
 # default params
 threads=1; mem=4; len=1000; out=false; ASSEMBLY=false
@@ -122,7 +135,7 @@ if [ $metabat2 = false ] && [ $metabat1 = false ] &&[ $maxbin2 = false ] && [ $c
 fi
 
 # check if all parameters are entered
-if [ $out = false ] || [ $ASSEMBLY = false ] ; then 
+if [ $out = false ] || [ $ASSEMBLY = false ] ; then
 	comm "Non-optional parameters -a and/or -o were not entered"
 	help_message; exit 1
 fi
@@ -189,7 +202,7 @@ announcement "ALIGNING READS TO MAKE COVERAGE FILES"
 
 # setting up the output folder
 if [ ! -d $out ]; then mkdir $out;
-else 
+else
 	echo "Warning: $out already exists."
 	rm -r ${out}/*checkm
 fi
@@ -220,15 +233,15 @@ fi
 for num in "$@"; do
 	# paired end reads
 	if [ $read_type = paired ]; then
-		if [[ $num == *"_1.fastq"* ]]; then 
+		if [[ $num == *"_1.fastq"* ]]; then
 			reads_1=$num
 			reads_2=${num%_*}_2.fastq
 			if [ ! -s $reads_1 ]; then error "$reads_1 does not exist. Exiting..."; fi
 			if [ ! -s $reads_2 ]; then error "$reads_2 does not exist. Exiting..."; fi
-	
+
 			tmp=${reads_1##*/}
 			sample=${tmp%_*}
-			
+
 			if [[ ! -f ${out}/work_files/${sample}.bam ]]; then
 				comm "Aligning $reads_1 and $reads_2 back to assembly"
 				bwa mem -v 1 -t $threads ${out}/work_files/assembly.fa $reads_1 $reads_2 > ${out}/work_files/${sample}.sam
@@ -261,7 +274,7 @@ for num in "$@"; do
 				else
 					error "something from with the read_type (=$read_type)"
 				fi
-				
+
 				comm "Sorting the $sample alignment file"
 				samtools sort -T ${out}/work_files/tmp-samtools -@ $threads -O BAM -o ${out}/work_files/${sample}.bam ${out}/work_files/${sample}.sam
 				if [[ $? -ne 0 ]]; then error "Something went wrong with sorting the alignments. Exiging..."; fi
@@ -280,7 +293,7 @@ if [ $metabat2 = true ]; then
 	########################################################################################################
 	announcement "RUNNING METABAT2"
 
-	comm "making contig depth file..."	
+	comm "making contig depth file..."
 	jgi_summarize_bam_contig_depths --outputDepth ${out}/work_files/metabat_depth.txt ${out}/work_files/*.bam
 	if [[ $? -ne 0 ]]; then error "Something went wrong with making contig depth file. Exiting."; fi
 
@@ -330,13 +343,13 @@ if [ $maxbin2 = true ]; then
         if [[ $? -ne 0 ]]; then error "Something went wrong with making contig depth file. Exiting."; fi
 
 	#calculate total numper of columns
-	A=($(head -n 1 ${out}/work_files/mb2_master_depth.txt)) 
+	A=($(head -n 1 ${out}/work_files/mb2_master_depth.txt))
 	N=${#A[*]}
-	
+
 	# split the contig depth file into multiple files
 	comm "split master contig depth file into individual files for maxbin2 input"
 	if [ -f ${out}/work_files/mb2_abund_list.txt ]; then rm ${out}/work_files/mb2_abund_list.txt; fi
-	for i in $(seq 4 $N); do 
+	for i in $(seq 4 $N); do
 		sample=$(head -n 1 ${out}/work_files/mb2_master_depth.txt | cut -f $i)
 		echo "processing $sample depth file..."
 		grep -v totalAvgDepth ${out}/work_files/mb2_master_depth.txt | cut -f 1,$i > ${out}/work_files/mb2_${sample%.*}.txt
@@ -355,16 +368,16 @@ if [ $maxbin2 = true ]; then
 		conda_path=${conda_path%/*}
 		if [ $(echo -n $conda_path | tail -c 1) = "/" ]; then conda_path=${conda_path%/*}; fi
 		conda_path=${conda_path%/*}
-		if [ ! -d ${conda_path}/lib/perl5/site_perl/5.22.0 ]; then 
+		if [ ! -d ${conda_path}/lib/perl5/site_perl/5.22.0 ]; then
 			error "${conda_path}/lib/perl5/site_perl/5.22.0 does not exixt. Cannot set manual path to perl5 libraries. Exiting..."
 		fi
-	
+
 	        perl_libs=${conda_path}/lib/perl5/site_perl/5.22.0
 	        echo "Will use perl5 libraries located in $perl_libs - hopefully they are there. Install Perl in the conda environment if the directory does not exist."
 		export PERL5LIB="$perl_libs"
 	fi
 
-	
+
 	comm "Starting binning with MaxBin2..."
 	mkdir ${out}/work_files/maxbin2_out
 	run_MaxBin.pl -contig ${out}/work_files/assembly.fa -markerset $markers -thread $threads -min_contig_length $len\
@@ -404,7 +417,7 @@ if [ $concoct = true ]; then
 		cut_up_fasta.py ${out}/work_files/assembly.fa -c 10000 --merge_last -b ${out}/work_files/assembly_10K.bed -o 0 > ${out}/work_files/assembly_10K.fa
         	if [[ $? -ne 0 ]]; then error "Something went wrong with cutting up contigs. Exiting."; fi
 
-		comm "estimating contig fragment coverage..."	
+		comm "estimating contig fragment coverage..."
 		CMD="concoct_coverage_table.py ${out}/work_files/assembly_10K.bed ${out}/work_files/*.bam > ${out}/work_files/concoct_depth.txt"
 		$(eval $CMD)
 		if [[ $? -ne 0 ]]; then error "Something went wrong with estimating fragment abundance. Exiting..."; fi
@@ -462,4 +475,3 @@ fi
 ########################      BINNING PIPELINE SUCCESSFULLY FINISHED!!!         ########################
 ########################################################################################################
 announcement "BINNING PIPELINE SUCCESSFULLY FINISHED!!!"
-

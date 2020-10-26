@@ -3,10 +3,10 @@
 ##############################################################################################################################################################
 #
 # This script is meant to be run on the outputs of binning.sh pipeline to analyze the metagenomic bins and arrive at the best possible putative genomes.
-# 
+#
 # Author of pipeline: German Uritskiy. I do not clain any authorship of the many programs this pipeline uses.
 # For questions, bugs, and suggestions, contact me at guritsk1@jhu.edu.
-# 
+#
 ##############################################################################################################################################################
 
 
@@ -25,7 +25,7 @@ help_message () {
 	echo ""
 	echo "	-A STR		folder with metagenomic bins (files must have .fa or .fasta extension)"
 	echo "	-B STR		another folder with metagenomic bins"
-	echo "	-C STR		another folder with metagenomic bins" 
+	echo "	-C STR		another folder with metagenomic bins"
 	echo ""
 	echo "	--skip-refinement	dont use binning_refiner to come up with refined bins based on combinations of binner outputs"
 	echo "	--skip-checkm		dont run CheckM to assess bins"
@@ -68,11 +68,24 @@ plot_checkm () {
 
 
 # setting scripts and databases from config file (should be in same folder as main script)
-config_file=$(which config-metawrap)
+case "$1" in
+        --config-metawrap)
+        export config_file=$2
+        echo "Config_file now set as: $config_file"
+        shift 2
+        ;;
+        *)
+        export config_file=$(which config-metawrap)
+        echo "Using config-metawrap file in container: $config_file"
+        ;;
+esac
+
 source $config_file
 
+echo "**Sourced config-metawrap from: $config_file**"
+
 # default params
-threads=1; mem=40; out="false"; comp=70; cont=10; x=10; c=70; 
+threads=1; mem=40; out="false"; comp=70; cont=10; x=10; c=70;
 bins1=None; bins2=None; bins3=None
 # long options defaults
 run_checkm=true; refine=true; cherry_pick=true; dereplicate=partial; quick=false
@@ -110,7 +123,7 @@ done
 ########################################################################################################
 
 # check if all parameters are entered
-if [[ $out == false ]] || [[  $bins1 == false ]] ; then 
+if [[ $out == false ]] || [[  $bins1 == false ]] ; then
 	comm "Non-optional parameters -o and/or -A were not entered"
 	help_message; exit 1
 fi
@@ -152,14 +165,14 @@ fi
 
 
 n_binnings=0
-if [[ -d $bins1 ]]; then 
+if [[ -d $bins1 ]]; then
 	mkdir ${out}/binsA
 	for F in ${bins1}/*; do
 		SIZE=$(stat -c%s "$F")
-		if (( $SIZE > 50000)) && (( $SIZE < 20000000)); then 
+		if (( $SIZE > 50000)) && (( $SIZE < 20000000)); then
 			BASE=${F##*/}
 			cp $F ${out}/binsA/${BASE%.*}.fa
-		else 
+		else
 			echo "Skipping $F because the bin size is not between 50kb and 20Mb"
 		fi
 	done
@@ -170,14 +183,14 @@ else
 	error "$bins1 is not a valid directory. Exiting."
 fi
 
-if [[ -d $bins2 ]]; then 
+if [[ -d $bins2 ]]; then
 	mkdir ${out}/binsB
 	for F in ${bins2}/*; do
 		SIZE=$(stat -c%s "$F")
-		if (( $SIZE > 50000)) && (( $SIZE < 20000000)); then 
+		if (( $SIZE > 50000)) && (( $SIZE < 20000000)); then
 			BASE=${F##*/}
 			cp $F ${out}/binsB/${BASE%.*}.fa
-		else 
+		else
 			echo "Skipping $F because the bin size is not between 50kb and 20Mb"
 		fi
         done
@@ -186,14 +199,14 @@ if [[ -d $bins2 ]]; then
 	if [[ $(ls ${out}/binsB | wc -l) -eq 0 ]]; then error "Please provide valid input. Exiting..."; fi
 fi
 
-if [[ -d $bins3 ]]; then 
+if [[ -d $bins3 ]]; then
 	mkdir ${out}/binsC
 	for F in ${bins3}/*; do
 		SIZE=$(stat -c%s "$F")
-		if (( $SIZE > 50000)) && (( $SIZE < 20000000)); then 
+		if (( $SIZE > 50000)) && (( $SIZE < 20000000)); then
 			BASE=${F##*/}
 			cp $F ${out}/binsC/${BASE%.*}.fa
-		else 
+		else
 			echo "Skipping $F because the bin size is not between 50kb and 20Mb"
 		fi
         done
@@ -220,7 +233,7 @@ home=$(pwd)
 cd $out
 
 if [ "$refine" == "true" ] && [[ ! -s work_files/binsA.stats ]]; then
-	announcement "BEGIN BIN REFINEMENT"	
+	announcement "BEGIN BIN REFINEMENT"
 	if [[ $n_binnings -eq 1 ]]; then
 		comm "There is only one bin folder, so no refinement of bins possible. Moving on..."
 	elif [[ $n_binnings -eq 2 ]]; then
@@ -232,14 +245,14 @@ if [ "$refine" == "true" ] && [[ ! -s work_files/binsA.stats ]]; then
 		rm -r Refined_AB
 	elif [[ $n_binnings -eq 3 ]]; then
 		comm "There are three bin folders, so there 4 ways we can refine the bins (A+B, B+C, A+C, A+B+C). Will try all four in parallel!"
-		
+
 		${SOFT}/binning_refiner.py -1 binsA -2 binsB -3 binsC -o Refined_ABC &
 		${SOFT}/binning_refiner.py -1 binsA -2 binsB -o Refined_AB &
 		${SOFT}/binning_refiner.py -1 binsC -2 binsB -o Refined_BC &
 		${SOFT}/binning_refiner.py -1 binsA -2 binsC -o Refined_AC &
-		
+
 		wait
-	
+
 		comm "there are $(ls Refined_AB/Refined | grep ".fa" | wc -l) refined bins in binsAB"
 		comm "there are $(ls Refined_BC/Refined | grep ".fa" | wc -l) refined bins in binsBC"
 		comm "there are $(ls Refined_AC/Refined | grep ".fa" | wc -l) refined bins in binsAC"
@@ -249,15 +262,15 @@ if [ "$refine" == "true" ] && [[ ! -s work_files/binsA.stats ]]; then
 		mv Refined_ABC/Refined binsABC
 		if [[ $? -ne 0 ]]; then error "Bin_refiner did not finish correctly with A+B+C. Exiting..."; fi
 		rm -r Refined_ABC
-		
+
 		mv Refined_AB/Refined binsAB
 		if [[ $? -ne 0 ]]; then error "Bin_refiner did not finish correctly with A+B. Exiting..."; fi
 		rm -r Refined_AB
-	
+
 		mv Refined_BC/Refined binsBC
 		if [[ $? -ne 0 ]]; then error "Bin_refiner did not finish correctly with B+C. Exiting..."; fi
 		rm -r Refined_BC
-		
+
 		mv Refined_AC/Refined binsAC
 		if [[ $? -ne 0 ]]; then error "Bin_refiner did not finish correctly with A+C. Exiting..."; fi
 		rm -r Refined_AC
@@ -270,16 +283,16 @@ elif [ "$refine" == "true" ] && [[ -s work_files/binsM.stats ]]; then
 else
 	comm "Skipping bin refinement. Will proceed with the $n_binnings bins specified."
 fi
-	
+
 comm "fixing bin naming to .fa convention for consistancy..."
-for i in $(ls); do 
-	for j in $(ls $i | grep .fasta); do 
+for i in $(ls); do
+	for j in $(ls $i | grep .fasta); do
 		mv ${i}/${j} ${i}/${j%.*}.fa
 	done
 done
 
 comm "making sure every refined bin set contains bins..."
-for bin_set in $(ls | grep bins); do 
+for bin_set in $(ls | grep bins); do
 	if [[ $(ls $bin_set|grep -c fa) == 0 ]]; then
 		comm "Removing bin set $bin_set because it yielded 0 refined bins ... "
 		rm -r $bin_set
@@ -292,7 +305,7 @@ done
 ########################################################################################################
 if [ "$run_checkm" == "true" ] && [[ ! -s work_files/binsM.stats ]]; then
 	announcement "RUNNING CHECKM ON ALL SETS OF BINS"
-	for bin_set in $(ls | grep -v tmp | grep -v stats | grep bins); do 
+	for bin_set in $(ls | grep -v tmp | grep -v stats | grep bins); do
 		comm "Running CheckM on $bin_set bins"
 		if [[ -d ${bin_set}.checkm ]]; then rm -r ${bin_set}.checkm; fi
 		if [[ ! -d ${bin_set}.tmp ]]; then mkdir ${bin_set}.tmp; fi
@@ -302,7 +315,7 @@ if [ "$run_checkm" == "true" ] && [[ ! -s work_files/binsM.stats ]]; then
 		else
 			checkm lineage_wf -x fa $bin_set ${bin_set}.checkm -t $threads --tmpdir ${bin_set}.tmp --pplacer_threads $p_threads
 		fi
-		
+
 		if [[ ! -s ${bin_set}.checkm/storage/bin_stats_ext.tsv ]]; then error "Something went wrong with running CheckM. Exiting..."; fi
 		${SOFT}/summarize_checkm.py ${bin_set}.checkm/storage/bin_stats_ext.tsv $bin_set | (read -r; printf "%s\n" "$REPLY"; sort) > ${bin_set}.stats
 		if [[ $? -ne 0 ]]; then error "Cannot make checkm summary file. Exiting."; fi
@@ -359,10 +372,10 @@ if [ "$cherry_pick" == "true" ]; then
 	else
 		error "Something went wrong with determining the number of bin folders... The number was ${n_binnings}. Exiting."
 	fi
-	
+
 elif [ "$cherry_pick" == "false" ]; then
 	comm "Skipping bin consolidation. Will try to pick the best binning folder without mixing bins from different sources."
-	if [ $run_checkm = false ]; then 
+	if [ $run_checkm = false ]; then
 		comm "cannot decide on best bin set because CheckM was not run. Will assume its binsA (first bin set)"
 		best_bin_set=binsA
 	elif [ $run_checkm = true ]; then
@@ -411,7 +424,7 @@ if [ "$run_checkm" == "true" ] && [ $dereplicate != "false" ]; then
 	rm -r binsO.checkm
 	num=$(cat binsO.stats | awk -v c="$comp" -v x="$cont" '{if ($2>=c && $2<=100 && $3>=0 && $3<=x) print $1 }' | wc -l)
 	comm "There are $num 'good' bins found in binsO.checkm! (>${comp}% completion and <${cont}% contamination)"
-	
+
 	comm "Removing bins that are inadequate quality..."
 	for bin_name in $(cat binsO.stats | grep -v compl | awk -v c="$comp" -v x="$cont" '{if ($2<c || $2>100 || $3<0 || $3>x) print $1 }' | cut -f1); do
 		echo "${bin_name} will be removed because it fell below the quality threshhold after de-replication of contigs..."
@@ -476,7 +489,7 @@ if [ "$run_checkm" == "true" ]; then
         ${SOFT}/plot_binning_results.py $comp $cont $(ls | grep ".stats")
 	mv binning_results.eps figures/binning_results.eps
 	mv binning_results.png figures/binning_results.png
-	
+
 	comm "making contig membership files (for Anvio and other applications)"
 	for dir in *_bins; do
 		echo "summarizing $dir ..."
@@ -490,4 +503,3 @@ cd $home
 ########################     BIN_REFINEMENT PIPELINE SUCCESSFULLY FINISHED!!!   ########################
 ########################################################################################################
 announcement "BIN_REFINEMENT PIPELINE FINISHED SUCCESSFULLY!"
-

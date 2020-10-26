@@ -2,12 +2,12 @@
 
 ##############################################################################################################################################################
 #
-# This script is a modified pipeline from the program 'BLOBOLOGY', which produces a GC vs Coverage plot of the contigs, helping visualize bins and phylogenetic 
+# This script is a modified pipeline from the program 'BLOBOLOGY', which produces a GC vs Coverage plot of the contigs, helping visualize bins and phylogenetic
 # composition.The original script has been modified to be better suited for running on clusters.
 #
 # Author of original pipeline: Sujai Kumar (https://github.com/blaxterlab). Author of modifications: German Uritskiy. I do not take any credit for the original pipeline.
 # For questions, bugs, and suggestions, contact German Uritskiy at guritsk1@jhu.edu.
-# 
+#
 ##############################################################################################################################################################
 
 
@@ -37,12 +37,25 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
 
 # setting scripts and databases from config file (should be in same folder as main script)
-config_file=$(which config-metawrap)
+case "$1" in
+        --config-metawrap)
+        export config_file=$2
+        echo "Config_file now set as: $config_file"
+        shift 2
+        ;;
+        *)
+        export config_file=$(which config-metawrap)
+        echo "Using config-metawrap file in container: $config_file"
+        ;;
+esac
+
 source $config_file
+
+echo "**Sourced config-metawrap from: $config_file**"
 
 
 # Set defaults
-threads=1; out="false"; n_contigs="false"; 
+threads=1; out="false"; n_contigs="false";
 ASSEMBLY="false"; bin_folder=false
 
 # load in params
@@ -71,7 +84,7 @@ done
 ########################################################################################################
 
 # check if all parameters are entered
-if [ "$out" = "false" ] || [ "$ASSEMBLY" = "false" ]; then 
+if [ "$out" = "false" ] || [ "$ASSEMBLY" = "false" ]; then
 	help_message; exit 1
 fi
 
@@ -138,7 +151,7 @@ fi
 assembly=${ASSEMBLY##*/}
 SAMPLE=${assembly%.*}
 
-if [ "$n_contigs" = "false" ]; then 
+if [ "$n_contigs" = "false" ]; then
 	cp $ASSEMBLY ${out}/$assembly
 else
 	## the following command selects desired number of contigs at random to classify and plot:
@@ -155,7 +168,7 @@ else
 	comm "Looks like taxonomy assignment was already run. Skipping..."
 fi
 
-if [[ ! -s ${out}/${SAMPLE}.nt.1e-5.megablast ]] ; then 
+if [[ ! -s ${out}/${SAMPLE}.nt.1e-5.megablast ]] ; then
 	error "Something went wrong with assigning taxonomy to contigs with megablast. Exiting";
 fi
 
@@ -178,17 +191,17 @@ for arg in "$@"; do
         if [[ $arg == *"_1.fastq" ]]; then
 		f_reads=$arg
 		r_reads=${arg%_*}_2.fastq
-	
+
 		if [ ! -s $f_reads ]; then error "$f_reads file does not exist. Exiting..."; fi
 		if [ ! -s $r_reads ]; then error "$r_reads file does not exist. Exiting..."; fi
-	
+
 		base=${arg##*/}
 		sample=${base%_*}
 		if [[ ! -s ${out}/${sample}.bowtie2.bam ]] ; then
 			#${SOFT}/blobology/shuffleSequences_fastx.pl 4 <(cat $f_reads) <(cat $r_reads) > ${out}/tmp
 			#if [[ $? -ne 0 ]]; then error "Something went wrong with shuffling reads. Exiting..."; fi
-			
-			comm "Now processing sample $sample ... Aligning $f_reads and $r_reads to ${out}/$assembly with bowtie2"	
+
+			comm "Now processing sample $sample ... Aligning $f_reads and $r_reads to ${out}/$assembly with bowtie2"
 			bowtie2 -x ${out}/$assembly --very-fast-local -k 1 -t -p $threads --mm -1 $f_reads -2 $r_reads > ${out}/${sample}.bowtie2.sam
 			if [[ $? -ne 0 ]]; then error "Failed to run bowtie2 on sample $sample reads. Exiting..."; fi
 
@@ -214,7 +227,7 @@ if [[ ! -s ${out}/${SAMPLE}.blobplot ]]; then
 	${SOFT}/blobology/gc_cov_annotate.pl --blasttaxid ${out}/${SAMPLE}.nt.1e-5.megablast\
 	 --assembly ${out}/$assembly --bam ${out}/*.bowtie2.bam\
 	 --out ${out}/${SAMPLE}.blobplot --taxdump $TAXDUMP --taxlist species genus family order subclass phylum superkingdom
-	if [[ ! -s ${out}/${SAMPLE}.blobplot ]]; then 
+	if [[ ! -s ${out}/${SAMPLE}.blobplot ]]; then
 		error "Something went wrong with making the blob file from the .bam and .megablast files. Exiting."
 	fi
 	comm "blobplot text file saved to ${out}/${SAMPLE}.blobplot"
@@ -225,10 +238,10 @@ fi
 if [ ! "$bin_folder" = false ]; then
 	comm "adding bin annotations to blobfile ${out}/${SAMPLE}.blobplot"
 	${SOFT}/add_bins_to_blobplot.py ${out}/${SAMPLE}.blobplot $bin_folder > ${out}/${SAMPLE}.binned.blobplot
-	
+
 	if [[ $? -ne 0 ]]; then error "Something went wrong with annotating the blobplot by bins. Exiting..."; fi
 
-	if [ $(cat ${out}/${SAMPLE}.binned.blobplot | grep -v "Unbinned" | wc -l) -lt 2 ]; then 
+	if [ $(cat ${out}/${SAMPLE}.binned.blobplot | grep -v "Unbinned" | wc -l) -lt 2 ]; then
 		warning "No contigs matches were found in the bins privided. This may be because the contigs in the $bin_folder folder are not the same as the contigs in the $ASSEMBLY file. Please check your inputs. The blobplot will not be annotated with bins."
 		rm ${out}/${SAMPLE}.binned.blobplot
 		$bin_folder=false
@@ -253,8 +266,8 @@ ${SOFT}/blobology/makeblobplot.R ${out}/${SAMPLE}.blobplot 0.005 taxlevel_superk
 if [[ $? -ne 0 ]]; then error "Something went wrong with making the superkingdom blobplot image. Exiting..."; fi
 
 ## The output file blobplot.txt can also be loaded into Blobsplorer - see github.com/mojones/blobsplorer
-if [[ ! -s ${out}/${SAMPLE}.blobplot.taxlevel_phylum.png ]]; then 
-	error "Something went wrong with making the plots from the blob file. Exiting."; 
+if [[ ! -s ${out}/${SAMPLE}.blobplot.taxlevel_phylum.png ]]; then
+	error "Something went wrong with making the plots from the blob file. Exiting.";
 fi
 
 if [ ! "$bin_folder" = false ]; then
@@ -267,7 +280,7 @@ if [ ! "$bin_folder" = false ]; then
 
 	${SOFT}/blobology/makeblobplot_with_bins.R ${out}/${SAMPLE}.blobplot 0.005 binned_phylum
 	if [[ $? -ne 0 ]]; then error "Something went wrong with making the blobplot image with binned phylum annotations. Exiting..."; fi
-	
+
 
 	comm "making blobplot images of only the contigs that were binned"
 	${SOFT}/blobology/makeblobplot_with_colored_bins.R ${out}/${SAMPLE}.binned.blobplot 0.000001 bin
@@ -276,13 +289,13 @@ if [ ! "$bin_folder" = false ]; then
 	comm "making blobplots of only binned contigs with phylogeny annotations (order, phylum, and superkingdom)."
 	${SOFT}/blobology/makeblobplot.R ${out}/${SAMPLE}.binned.blobplot 0.005 taxlevel_order
 	if [[ $? -ne 0 ]]; then error "Something went wrong with making the binned order blobplot image. Exiting..."; fi
-	
+
 	${SOFT}/blobology/makeblobplot.R ${out}/${SAMPLE}.binned.blobplot 0.005 taxlevel_phylum
 	if [[ $? -ne 0 ]]; then error "Something went wrong with making the binned phylum blobplot image. Exiting..."; fi
 
 	${SOFT}/blobology/makeblobplot.R ${out}/${SAMPLE}.binned.blobplot 0.005 taxlevel_superkingdom
 	if [[ $? -ne 0 ]]; then error "Something went wrong with making the binned superkingdom blobplot image. Exiting..."; fi
-	
+
 
 	mkdir ${out}/blobplot_figures_only_binned_contigs
 	mv ${out}/*.binned.blobplot*png ${out}/blobplot_figures_only_binned_contigs

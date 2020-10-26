@@ -3,14 +3,14 @@
 ##############################################################################################################################################################
 #
 # This script is meant to be run on paired end reads (with extensions *_1.fastq and *_2.fastq) or assembled contigs (*.fa or *.fasta).
-# The script runs KRAKEN on the sequences, then translates them to taxonomy form with a custom script. Then in-house scripts are used to 
+# The script runs KRAKEN on the sequences, then translates them to taxonomy form with a custom script. Then in-house scripts are used to
 # parse out the taxonomy into the format for KRONA-TOOLS, colapse the file to save memory, and finally produce a prety kronagram with all the files.
 #
 # NOTE: KRAKEN2 and KronaTools requires instalation, and be sure the configure the right path to the KRAKEN2 folder and the KRAKEN2 database.
 #
 # Author of pipeline: Gherman Uritskiy. I do not have any authorship of the many programs this pipeline uses.
 # For questions, bugs, and suggestions, contact me at guritsk1@jhu.edu.
-# 
+#
 ##############################################################################################################################################################
 
 
@@ -19,7 +19,7 @@ help_message () {
 	echo "Run on any number of fasta assembly files and/or or paired-end reads."
 	echo "Usage: metaWRAP kraken2 [options] -o output_dir assembly.fasta reads_1.fastq reads_2.fastq ..."
 	echo "Options:"
-	echo "" 
+	echo ""
 	echo "	-o STR          output directory"
 	echo "	-t INT          number of threads"
 	echo "	-s INT		read subsampling number (default=all)"
@@ -41,8 +41,21 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
 
 # setting scripts and databases from config file (should be in same folder as main script)
-config_file=$(which config-metawrap)
+case "$1" in
+        --config-metawrap)
+        export config_file=$2
+        echo "Config_file now set as: $config_file"
+        shift 2
+        ;;
+        *)
+        export config_file=$(which config-metawrap)
+        echo "Using config-metawrap file in container: $config_file"
+        ;;
+esac
+
 source $config_file
+
+echo "**Sourced config-metawrap from: $config_file**"
 
 # Set defaults
 threads=1; out="false"; depth="all"; preload=true
@@ -72,7 +85,7 @@ done
 ########################################################################################################
 
 # check if all parameters are entered
-if [ "$out" = "false" ] || [ "$#" -lt 1 ] ; then 
+if [ "$out" = "false" ] || [ "$#" -lt 1 ] ; then
 	help_message; exit 1
 fi
 
@@ -81,7 +94,7 @@ if [ ! -s $SOFT/sort_contigs.py ]; then
 	error "The folder $SOFT doesnt exist. Please make sure the meta-scriptss folder is in the same folder as the other reads_qc"
 fi
 
-# Checks for KRAKEN database 
+# Checks for KRAKEN database
 if [ ! -d "$KRAKEN2_DB" ]; then
 	error "The folder $KRAKEN2_DB doesnt exist. Please consult the metaWRAP database guite to download and build the KRAKEN2 database"
 fi
@@ -98,9 +111,9 @@ fi
 announcement "RUNNING KRAKEN ON ALL FILES"
 
 # setting up the output folder
-if [ ! -d $out ]; then 
+if [ ! -d $out ]; then
 	mkdir $out;
-else 
+else
 	echo "Warning: $out already exists."
 fi
 
@@ -111,15 +124,15 @@ for num in "$@"; do
 		reads_1=$num
 		reads_2=${num%_*}_2.fastq
 		if [ "$reads_2" = "false" ]; then error "$reads_2 does not exist. Exiting..."; fi
-		
+
 		tmp=${reads_1##*/}
 		sample=${tmp%_*}
 		comm "Now processing $reads_1 and $reads_2 with $threads threads"
 
 		# if sampling depth is specified, randomly subsample the fastq reads
 		if [ ! "$depth" = "all" ]; then
-			comm "subsampling down to $depth reads..." 
-			# combine paired end reads onto one line, then 
+			comm "subsampling down to $depth reads..."
+			# combine paired end reads onto one line, then
 			# shuffle reads, select top N reads, and then restore tabulation, then
 			# separate reads into F and R files
 			paste $reads_1 $reads_2 | \
@@ -139,16 +152,16 @@ for num in "$@"; do
 		else
 			CMD="kraken2 --use-names --db ${KRAKEN2_DB} --paired --threads $threads --output ${out}/${sample}.krak2 --memory-mapping $reads_1 $reads_2"
 		fi
-		
+
 		if [ -s ${out}/${sample}.krak2 ]; then
 			comm "${out}/${sample}.krak2 already exists - skipping running kraken2"
 		else
 			echo $CMD
 			$CMD
 		fi
-	
+
 		if [[ $? -ne 0 ]] || [[ ! -s ${out}/${sample}.krak2 ]]; then error "Something went wrong with running kraken2 on $reads_1 and $reads_2 . Exiting..."; fi
-			
+
 		if [ ! "$depth" = "all" ]; then rm ${out}/tmp_1.fastq ${out}/tmp_2.fastq; fi
 	fi
 
@@ -157,13 +170,13 @@ for num in "$@"; do
 		tmp=${num##*/}
 		sample=${tmp%.*}
 		comm "Now processing $num with $threads threads"
-		
+
 		if [ "$preload" = true ]; then
 			CMD="kraken2 --use-names --db ${KRAKEN2_DB} --threads $threads --output ${out}/${sample}.krak2 $num"
 		else
 			CMD="kraken2 --use-names --db ${KRAKEN2_DB} --threads $threads --output ${out}/${sample}.krak2 --memory-mapping $num"
 		fi
-		
+
 		if [ -s ${out}/${sample}.krak2 ]; then
 			comm "${out}/${sample}.krak2 already exists - skipping running kraken2"
 		else
@@ -176,7 +189,7 @@ for num in "$@"; do
 done
 
 # check if any files were processed
-if [[ $( ls $out | grep ".krak" | wc -l ) -eq 0 ]]; then 
+if [[ $( ls $out | grep ".krak" | wc -l ) -eq 0 ]]; then
 	comm "No fasta or fastq files detected! (must be in .fastq .fa .fastq or .fq format)"
 	help_message; exit 1
 fi
@@ -214,4 +227,3 @@ if [[ ! -s ${out}/kronagram.html ]]; then error "Something went wrong with runni
 ########################         FINISHED RUNNING KRAKEN2 PIPELINE!!!            ########################
 ########################################################################################################
 announcement "FINISHED RUNNING KRAKEN2 PIPELINE!!!"
-
