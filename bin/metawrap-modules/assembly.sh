@@ -51,6 +51,7 @@ case "$1" in
         *)
         export config_file=$(which config-metawrap)
         echo "Using config-metawrap file in container: $config_file"
+				shift 2
         ;;
 esac
 
@@ -65,14 +66,13 @@ metaspades_assemble=false; megahit_assemble=true
 
 
 # load in params
-OPTS=`getopt -o ht:m:o:1:2:l: --long help,metaspades,megahit,config-metawrap -- "$@"`
+OPTS=`getopt -o ht:m:o:1:2:l: --long help,metaspades,megahit -- "$@"`
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
 # loop through input params
 while true; do
 	case "$1" in
-		--config-metawrap) shift 2;;
 		-t) threads=$2; shift 2;;
 		-m) mem=$2; shift 2;;
 		-o) out=$2; shift 2;;
