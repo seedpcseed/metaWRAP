@@ -101,7 +101,7 @@ checkm=false; read_type=paired
 markers=107
 
 # load in params
-OPTS=`getopt -o ht:m:o:a:l: --long help,metabat1,metabat2,maxbin2,concoct,run-checkm,single-end,universal,interleaved -- "$@"`
+OPTS=`getopt -o ht:m:o:a:l: --long help,metabat1,metabat2,maxbin2,concoct,run-checkm,single-end,universal,interleaved,config-metawrap -- "$@"`
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
 # loop through input params

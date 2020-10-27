@@ -63,7 +63,7 @@ threads=1; out="false"; depth="all"; preload=true
 
 
 # load in params
-OPTS=`getopt -o ht:o:s: --long help,no-preload -- "$@"`
+OPTS=`getopt -o ht:o:s: --long help,no-preload,config-metawrap -- "$@"`
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 

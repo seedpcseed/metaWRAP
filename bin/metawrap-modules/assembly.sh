@@ -65,7 +65,7 @@ metaspades_assemble=false; megahit_assemble=true
 
 
 # load in params
-OPTS=`getopt -o ht:m:o:1:2:l: --long help,metaspades,megahit -- "$@"`
+OPTS=`getopt -o ht:m:o:1:2:l: --long help,metaspades,megahit,config-metawrap -- "$@"`
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 

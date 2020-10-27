@@ -55,7 +55,7 @@ echo "**Sourced config-metawrap from: $config_file**"
 threads=1; bins=None; out=None
 
 # load in params
-OPTS=`getopt -o ht:o:b: --long help -- "$@"`
+OPTS=`getopt -o ht:o:b: --long config-metawrap help -- "$@"`
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 

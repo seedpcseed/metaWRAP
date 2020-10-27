@@ -92,7 +92,7 @@ bins1=None; bins2=None; bins3=None
 run_checkm=true; refine=true; cherry_pick=true; dereplicate=partial; quick=false
 
 # load in params
-OPTS=`getopt -o ht:m:o:x:c:A:B:C: --long help,skip-checkm,skip-refinement,skip-consolidation,keep-ambiguous,remove-ambiguous,quick -- "$@"`
+OPTS=`getopt -o ht:m:o:x:c:A:B:C: --long help,skip-checkm,skip-refinement,skip-consolidation,keep-ambiguous,remove-ambiguous,quick,config-metawrap -- "$@"`
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 

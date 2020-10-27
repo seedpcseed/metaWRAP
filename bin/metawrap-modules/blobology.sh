@@ -60,7 +60,7 @@ threads=1; out="false"; n_contigs="false";
 ASSEMBLY="false"; bin_folder=false
 
 # load in params
-OPTS=`getopt -o ht:o:a: --long help,bins,subsample -- "$@"`
+OPTS=`getopt -o ht:o:a: --long help,bins,subsample,config-metawrap -- "$@"`
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 

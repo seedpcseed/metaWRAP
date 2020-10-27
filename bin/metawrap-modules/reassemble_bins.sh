@@ -89,7 +89,7 @@ strict_max=2; permissive_max=5
 run_checkm=true
 run_parallel=false
 # load in params
-OPTS=`getopt -o ht:m:o:x:c:l:b:1:2: --long help,parallel,skip-checkm,strict-cut-off,permissive-cut-off -- "$@"`
+OPTS=`getopt -o ht:m:o:x:c:l:b:1:2: --long help,parallel,skip-checkm,strict-cut-off,permissive-cut-off,config-metawrap -- "$@"`
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
