@@ -45,7 +45,7 @@ source $config_file
 
 echo "Running assembly.sh ........"
 echo "**Sourced config-metawrap from: $config_file**"
-echo "Current contents of params 1 and 2 are: $1 and $2"
+# echo "Current contents of params 1 and 2 are: $1 and $2"
 
 # default params
 mem=24; threads=1; out="false"; reads_1="false"; reads_2="false"; min_len=1000

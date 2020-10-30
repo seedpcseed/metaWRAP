@@ -29,24 +29,16 @@ help_message () {
 	echo "	--show-config	show where the metawrap configuration files are stored"
         echo "";}
 
-config_file=""
+# config_file=""
+export PATH=$PATH:$PWD
 
-while
-do
+while true; do
   case "$1" in
-        --config-metawrap)
-        export config_file=$2
-        echo "Config_file now set as: $config_file"
-        shift 2
-        ;;
+        --config-metawrap) export config_file=$2; echo "Config_file now set as: $config_file"; shift 2 ;;
+	-- ) shift; break;; 
+	* )  export config_file=$PWD/config-metawrap; echo "Using default config-metawrap"; break;;
   esac
 done
-
-if [ -z $config_file ]
-  then
-  export config_file=$(which config-metawrap)
-  echo "Using config-metawrap file in container: $config_file"
-fi
 
 source $config_file
 

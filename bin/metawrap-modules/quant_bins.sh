@@ -35,19 +35,7 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 ########################################################################################################
 
 
-# setting scripts and databases from config file (should be in same folder as main script)
-case "$1" in
-        --config-metawrap)
-        export config_file=$2
-        echo "Config_file now set as: $config_file"
-        shift 2
-        ;;
-        *)
-        export config_file=$(which config-metawrap)
-        echo "Using config-metawrap file in container: $config_file"
-        ;;
-esac
-
+$config_file = $1 && shift 1
 source $config_file
 
 echo "Running quant_bins.sh........................."
@@ -59,7 +47,7 @@ threads=1; out=false; bin_folder=false; assembly=false
 # long options defaults
 
 # load in params
-OPTS=`getopt -o ht:o:b:a: --long config-metawrap help -- "$@"`
+# OPTS=`getopt -o ht:o:b:a: --long config-metawrap help -- "$@"`
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
