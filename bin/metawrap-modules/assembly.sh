@@ -40,33 +40,20 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 ########################               LOADING IN THE PARAMETERS                ########################
 ########################################################################################################
 
-
-# setting scripts and databases from config file (should be in same folder as main script)
-case "$1" in
-        --config-metawrap)
-        export config_file=$2
-        echo "Config_file now set as: $config_file"
-        shift 2
-        ;;
-        *)
-        export config_file=$(which config-metawrap)
-        echo "Using config-metawrap file in container: $config_file"
-				shift 2
-        ;;
-esac
-
+$config_file = $1 && shift 1
 source $config_file
+
 echo "Running assembly.sh ........"
 echo "**Sourced config-metawrap from: $config_file**"
+echo "Current contents of params 1 and 2 are: $1 and $2"
 
 # default params
 mem=24; threads=1; out="false"; reads_1="false"; reads_2="false"; min_len=1000
 # long options defaults
 metaspades_assemble=false; megahit_assemble=true
 
-
 # load in params
-OPTS=`getopt -o ht:m:o:1:2:l: --long help,metaspades,megahit -- "$@"`
+# OPTS=`getopt -o ht:m:o:1:2:l: --long help,metaspades,megahit -- "$@"`
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
