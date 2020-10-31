@@ -35,7 +35,7 @@ export PATH=$PATH:$PWD
 while true; do
   case "$1" in
         --config-metawrap) export config_file=$2; echo "Config_file now set as: $config_file"; shift 2 ;;
-	-- ) shift; break;; 
+	-- ) shift; break;;
 	* )  export config_file=$PWD/config-metawrap; echo "Using default config-metawrap"; break;;
   esac
 done
@@ -64,7 +64,7 @@ comm () { ${SOFT}/print_comment.py "$1" "-"; }
 
 if [ "$1" = assembly ]; then
 	echo "metawrap assembly $config_file ${@:2}"
-	time ${PIPES}/assembly.sh $config_file ${@:2}"
+	time ${PIPES}/assembly.sh "$config_file ${@:2}"
 elif [ "$1" = phylosift ]; then
         #echo phylosift.sh ${@:2}
         #${PIPES}/phylosift.sh ${@:2}
