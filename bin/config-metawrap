@@ -1,9 +1,3 @@
-# Paths to custon pipelines and scripts of metaWRAP
-mw_path=$(which metawrap)
-bin_path=${mw_path%/*}
-SOFT=${bin_path}/metawrap-scripts
-PIPES=${bin_path}/metawrap-modules
-
 # OPTIONAL databases (see 'Databases' section of metaWRAP README for details)
 # path to kraken standard databases
 KRAKEN_DB=/scratch/gu/MY_KRAKEN_DB
