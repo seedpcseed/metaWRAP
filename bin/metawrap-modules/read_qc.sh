@@ -37,12 +37,16 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 ########################################################################################################
 
 
-$config_file = $1 && shift 1
+$config_file = $1 && shift
 # source $config_file
 
 
-echo "Running read_qc.sh....................."
+echo "Running read_qc.sh $1"
+echo ""
 echo "**Sourced config-metawrap from: $config_file**"
+echo "Modules in: $PIPES"
+echo "Scripts in: $SOFT"
+echo ""
 
 # default params
 threads=1; out="false"; reads_1="false"; reads_2="false"
