@@ -75,11 +75,23 @@ run_checkm () {
 ########################################################################################################
 
 
-$config_file = $1 && shift 1
-source $config_file
-
-echo "Running binning.sh......"
-echo "**Sourced config-metawrap from: $config_file**"
+#${config_file} = ${1} && shift
+echo ""
+echo ""
+echo "---------------------------------------"
+echo "** Sourced config-metawrap from: ${1} **"
+source $1 && shift
+echo "---------------------------------------"
+echo ""
+echo "======================================="
+echo "Running binning ${@:1}"
+echo "======================================="
+echo ""
+echo "---------------------------------------"
+echo "Modules in: $PIPES"
+echo "Scripts in: $SOFT"
+echo "---------------------------------------"
+echo ""
 
 # default params
 threads=1; mem=4; len=1000; out=false; ASSEMBLY=false

@@ -40,12 +40,23 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 ########################################################################################################
 
 
-$config_file = $1 && shift 1
-source $config_file
-
-
-echo "Running kraken.sh ......."
-echo "**Sourced config-metawrap from: $config_file**"
+#${config_file} = ${1} && shift
+echo ""
+echo ""
+echo "---------------------------------------"
+echo "** Sourced config-metawrap from: ${1} **"
+source $1 && shift
+echo "---------------------------------------"
+echo ""
+echo "======================================="
+echo "Running kraken ${@:1}"
+echo "======================================="
+echo ""
+echo "---------------------------------------"
+echo "Modules in: $PIPES"
+echo "Scripts in: $SOFT"
+echo "---------------------------------------"
+echo ""
 
 # Set defaults
 threads=1; out="false"; depth="all"; preload=true

@@ -36,16 +36,25 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 ########################               LOADING IN THE PARAMETERS                ########################
 ########################################################################################################
 
+#echo "This is $1 and $2 and $3 and combined ${@:2}"
+#echo ""
 
-$config_file = $1 && shift
-# source $config_file
-
-
-echo "Running read_qc.sh $1"
+#${config_file} = ${1} && shift
 echo ""
-echo "**Sourced config-metawrap from: $config_file**"
+echo ""
+echo "---------------------------------------"
+echo "** Sourced config-metawrap from: ${1} **"
+source $1 && shift
+echo "---------------------------------------"
+echo ""
+echo "======================================="
+echo "Running read_qc ${@:1}"
+echo "======================================="
+echo ""
+echo "---------------------------------------"
 echo "Modules in: $PIPES"
 echo "Scripts in: $SOFT"
+echo "---------------------------------------"
 echo ""
 
 # default params
@@ -54,7 +63,9 @@ bmtagger=true; trim=true; pre_qc_report=true; post_qc_report=true
 HOST=hg38
 
 # load in params
-OPTS=`getopt -o ht:o:1:2:x: --long help,skip-trimming,skip-bmtagger,skip-pre-qc-report,skip-post-qc-report-- "$@"`
+echo "This is 1: $1"
+echo ""
+OPTS=`getopt -o ht:o:1:2:x: --long help,skip-trimming,skip-bmtagger,skip-pre-qc-report,skip-post-qc-report -- "$@"`
 # make sure the params are entered correctly
 # if [ $? -ne 0 ]; then help_message; exit 1; fi
 
@@ -76,6 +87,10 @@ while true; do
 	esac
 done
 
+echo "Read 1 = $reads_1"
+echo "Read 2 = $reads_2"
+echo "Output dir = $out"
+echo ""
 
 ########################################################################################################
 ########################           MAKING SURE EVERYTHING IS SET UP             ########################

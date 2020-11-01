@@ -32,9 +32,24 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 ########################               LOADING IN THE PARAMETERS                ########################
 ########################################################################################################
 
+#${config_file} = ${1} && shift
+echo ""
+echo ""
+echo "---------------------------------------"
+echo "** Sourced config-metawrap from: ${1} **"
+source $1 && shift
+echo "---------------------------------------"
+echo ""
+echo "======================================="
+echo "Running annotate ${@:1}"
+echo "======================================="
+echo ""
+echo "---------------------------------------"
+echo "Modules in: $PIPES"
+echo "Scripts in: $SOFT"
+echo "---------------------------------------"
+echo ""
 
-$config_file = $1 && shift 1
-source $config_file
 
 # default params
 threads=1; bins=None; out=None

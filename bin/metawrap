@@ -38,7 +38,7 @@ echo "Default metawrap path = $mw_path"
 export bin_path=$mw_path
 echo "Default bin path = $bin_path"
 export SOFT=${bin_path}/metawrap-scripts
-echo "Metawrap-scripts in = $SOFT"
+echo "Metawrap scripts in = $SOFT"
 export PIPES=${bin_path}/metawrap-modules
 echo "Metawrap modules in = $PIPES"
 echo "==================================="
@@ -53,12 +53,9 @@ case "$1" in
 esac
 
 echo ""
-echo ""
 
 source $config_file
 
-echo "**Sourced config-metawrap from: $config_file**"
-echo ""
 echo ""
 
 # echo "which config-metawrap is: $(which config-metawrap)"
@@ -69,6 +66,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 echo "This is #1 after sourcing config_file: $1"
+echo "This is the rest of the parameters: ${@:2}"
 echo ""
 echo ""
 
@@ -81,35 +79,30 @@ comm () { ${SOFT}/print_comment.py "$1" "-"; }
 
 # setting scripts, pipelines, and databases locations from config file (should be in same folder as main script)
 
+ss="${config_file} ${@:2}"
 if [ "$1" = assembly ]; then
-	echo "metawrap assembly $config_file ${@:2}"
-  echo ""
-	time ${PIPES}/assembly.sh "$config_file ${@:2}"
+	echo "metawrap assembly $ss"
+	time ${PIPES}/assembly.sh ${ss}
 elif [ "$1" = phylosift ]; then
         #echo phylosift.sh ${@:2}
         #${PIPES}/phylosift.sh ${@:2}
 	echo "The PHYLOSIFT module of metaWRAP is disabled in this version of metaWRAP"
 	exit 1
 elif [ "$1" = read_qc ]; then
-	echo "metawrap read_qc $config_file ${@:2}"
-  echo ""
-	time ${PIPES}/read_qc.sh "$config_file ${@:2}"
+  echo "metawrap read_qc $ss"
+  time ${PIPES}/read_qc.sh ${ss}
 elif [ "$1" = binning ]; then
-  echo "metawrap binning $config_file ${@:2}"
-  echo ""
-  time ${PIPES}/binning.sh "$config_file ${@:2}"
+  echo "metawrap binning $ss"
+  time ${PIPES}/binning.sh ${ss}
 elif [ "$1" = blobology ]; then
-  echo "metawrap blobology $config_file ${@:2}"
-  echo ""
-	time ${PIPES}/blobology.sh "$config_file ${@:2}"
+  echo "metawrap blobology $ss"
+	time ${PIPES}/blobology.sh ${ss}
 elif [ "$1" = kraken ]; then
-  echo "metawrap kraken $config_file ${@:2}"
-  echo ""
-  time ${PIPES}/kraken.sh "$config_file ${@:2}"
+  echo "metawrap kraken $ss"
+  time ${PIPES}/kraken.sh ${ss}
 elif [ "$1" = kraken2 ]; then
-	echo "metawrap kraken2 $config_file ${@:2}"
-  echo ""
-	time ${PIPES}/kraken2.sh "$config_file ${@:2}"
+	echo "metawrap kraken2 $ss"
+	time ${PIPES}/kraken2.sh ${ss}
 elif [ "$1" = all ]; then
 	#echo all.sh --config-metawrap $config_file ${@:2}"
         # ${PIPES}/all.sh "$config_file ${@:2}"
@@ -117,25 +110,20 @@ elif [ "$1" = all ]; then
   echo ""
 	exit 1
 elif [ "$1" = bin_refinement ]; then
-  echo "metawrap bin_refinement $config_file ${@:2}"
-  echo ""
-  time ${PIPES}/bin_refinement.sh "$config_file ${@:2}"
+  echo "metawrap bin_refinement $ss"
+  time ${PIPES}/bin_refinement.sh ${ss}
 elif [ "$1" = reassemble_bins ]; then
-	echo "metawrap reassemble_bins $config_file ${@:2}"
-  echo ""
-	time ${PIPES}/reassemble_bins.sh "$config_file ${@:2}"
+	echo "metawrap reassemble_bins $ss"
+  time ${PIPES}/reassemble_bins.sh ${ss}
 elif [ "$1" = quant_bins ]; then
-	echo "metawrap quant_bins $config_file ${@:2}"
-  echo ""
-	time ${PIPES}/quant_bins.sh "$config_file ${@:2}"
+	echo "metawrap quant_bins $ss"
+	time ${PIPES}/quant_bins.sh ${ss}
 elif [ "$1" = classify_bins ]; then
-	echo "metawrap classify_bins $config_file ${@:2}"
-  echo ""
-	time ${PIPES}/classify_bins.sh "$config_file ${@:2}"
+	echo "metawrap classify_bins $ss"
+	time ${PIPES}/classify_bins.sh ${ss}
 elif [ "$1" = annotate_bins ]; then
-  echo "metawrap annotate_bins $config_file ${@:2}"
-  echo ""
-  time ${PIPES}/annotate_bins.sh "$config_file ${@:2}"
+  echo "metawrap annotate_bins $ss"
+  time ${PIPES}/annotate_bins.sh ${ss}
 elif [ "$1" = "-h" ] || [ "$1" = "--help" ]; then
 	help_message
 elif [ "$1" = "-v" ] || [ "$1" = "--version" ]; then

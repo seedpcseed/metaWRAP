@@ -15,12 +15,23 @@ error () { ${SOFT}/print_comment.py "$1" "*"; exit 1; }
 warning () { ${SOFT}/print_comment.py "$1" "*"; }
 announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
-$config_file = $1 && shift 1
-source $config_file
-
-
-echo "Running reassemble_bins.sh......."
-echo "**Sourced config-metawrap from: $config_file**"
+#${config_file} = ${1} && shift
+echo ""
+echo ""
+echo "---------------------------------------"
+echo "** Sourced config-metawrap from: ${1} **"
+source $1 && shift
+echo "---------------------------------------"
+echo ""
+echo "======================================="
+echo "Running checkm ${@:1}"
+echo "======================================="
+echo ""
+echo "---------------------------------------"
+echo "Modules in: $PIPES"
+echo "Scripts in: $SOFT"
+echo "---------------------------------------"
+echo ""
 
 # runs CheckM mini-pipeline on a single folder of bins
 if [[ -d ${1}.checkm ]]; then rm -r ${1}.checkm; fi

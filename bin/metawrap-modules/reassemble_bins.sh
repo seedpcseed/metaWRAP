@@ -62,12 +62,23 @@ run_with_lock(){
 ########################################################################################################
 
 
-$config_file = $1 && shift 1
-source $config_file
-
-
-echo "Running reassemble_bins.sh......."
-echo "**Sourced config-metawrap from: $config_file**"
+#${config_file} = ${1} && shift
+echo ""
+echo ""
+echo "---------------------------------------"
+echo "** Sourced config-metawrap from: ${1} **"
+source $1 && shift
+echo "---------------------------------------"
+echo ""
+echo "======================================="
+echo "Running reassembly ${@:1}"
+echo "======================================="
+echo ""
+echo "---------------------------------------"
+echo "Modules in: $PIPES"
+echo "Scripts in: $SOFT"
+echo "---------------------------------------"
+echo ""
 
 
 # default params

@@ -1,11 +1,13 @@
+export PIPES="$PWD/metawrap-modules"
+export SOFT="$PWD/metwrap-scripts"
+
 # OPTIONAL databases (see 'Databases' section of metaWRAP README for details)
 # path to kraken standard databases
-KRAKEN_DB=/scratch/gu/MY_KRAKEN_DB
-KRAKEN2_DB=/scratch/gu/MY_KRAKEN2_DB
+export KRAKEN2_DB="/projects/b1051/References/metawrap/kraken_db/"
 
 # path to indexed human genome (see metaWRAP website for guide). This includes files hg38.bitmask and hg38.srprism.*
-BMTAGGER_DB=/scratch/gu/BMTAGGER_DB
+export BMTAGGER_DB="/projects/b1051/References/metawrap/BMTAGGER_INDEX/"
 
 # paths to BLAST databases
-BLASTDB=/scratch/gu/NCBI_nt
-TAXDUMP=/scratch/gu/NCBI_tax
+export BLASTDB="/projects/b1051/References/metawrap/NCBI_nt/"
+export TAXDUMP="/projects/b1051/References/metawrap/NCBI_tax/"

@@ -40,12 +40,23 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 ########################               LOADING IN THE PARAMETERS                ########################
 ########################################################################################################
 
-$config_file = $1 && shift 1
-source $config_file
-
-echo "Running assembly.sh ........"
-echo "**Sourced config-metawrap from: $config_file**"
-# echo "Current contents of params 1 and 2 are: $1 and $2"
+#${config_file} = ${1} && shift
+echo ""
+echo ""
+echo "---------------------------------------"
+echo "** Sourced config-metawrap from: ${1} **"
+source $1 && shift
+echo "---------------------------------------"
+echo ""
+echo "======================================="
+echo "Running assembly ${@:1}"
+echo "======================================="
+echo ""
+echo "---------------------------------------"
+echo "Modules in: $PIPES"
+echo "Scripts in: $SOFT"
+echo "---------------------------------------"
+echo ""
 
 # default params
 mem=24; threads=1; out="false"; reads_1="false"; reads_2="false"; min_len=1000
@@ -53,7 +64,7 @@ mem=24; threads=1; out="false"; reads_1="false"; reads_2="false"; min_len=1000
 metaspades_assemble=false; megahit_assemble=true
 
 # load in params
-# OPTS=`getopt -o ht:m:o:1:2:l: --long help,metaspades,megahit -- "$@"`
+OPTS=`getopt -o ht:m:o:1:2:l: --long help,metaspades,megahit -- "$@"`
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
