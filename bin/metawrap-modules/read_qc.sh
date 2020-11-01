@@ -38,7 +38,7 @@ announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
 
 $config_file = $1 && shift 1
-source $config_file
+# source $config_file
 
 
 echo "Running read_qc.sh....................."
@@ -50,9 +50,9 @@ bmtagger=true; trim=true; pre_qc_report=true; post_qc_report=true
 HOST=hg38
 
 # load in params
-# OPTS=`getopt -o ht:o:1:2:x: --long help,skip-trimming,skip-bmtagger,skip-pre-qc-report,skip-post-qc-report,config-metawrap -- "$@"`
+OPTS=`getopt -o ht:o:1:2:x: --long help,skip-trimming,skip-bmtagger,skip-pre-qc-report,skip-post-qc-report-- "$@"`
 # make sure the params are entered correctly
-if [ $? -ne 0 ]; then help_message; exit 1; fi
+# if [ $? -ne 0 ]; then help_message; exit 1; fi
 
 # loop through input params
 while true; do
