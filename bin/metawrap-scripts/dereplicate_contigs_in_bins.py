@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.72.7
+#!/usr/bin/env python2.7
 import sys, os
 
 # Usage: ./script.py bins.stats binsFolder outFolder
