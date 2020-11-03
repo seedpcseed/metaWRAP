@@ -23,6 +23,3 @@ edge2=120-edge1-len(line) - 10
 print delim*5 + " "*edge1 + line + " "*edge2 + delim*5
 
 print delim*120+'\n'
-
-
-

@@ -10,29 +10,31 @@
 #SBATCH --mem=100G
 
 
-comm () { ${SOFT}/print_comment.py "$1" "-"; }
-error () { ${SOFT}/print_comment.py "$1" "*"; exit 1; }
-warning () { ${SOFT}/print_comment.py "$1" "*"; }
-announcement () { ${SOFT}/print_comment.py "$1" "#"; }
+comm () { ${PWD}/metawrap-scripts/print_comment.py "$1" "-"; }
+error () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; exit 1; }
+warning () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; }
+announcement () { ${PWD}/metawrap-scripts/print_comment.py "$1" "#"; }
 
-#${config_file} = ${1} && shift
-echo ""
-echo ""
-echo "---------------------------------------"
-echo "** Sourced config-metawrap from: ${1} **"
-source $1 && shift
-echo "---------------------------------------"
-echo ""
+########################################################################################################
+########################               LOADING IN THE PARAMETERS                ########################
+########################################################################################################
+
 echo "======================================="
-echo "Running checkm ${@:1}"
+echo "Running chekm ${@:1}"
 echo "======================================="
 echo ""
-echo "---------------------------------------"
-echo "Modules in: $PIPES"
-echo "Scripts in: $SOFT"
-echo "---------------------------------------"
-echo ""
 
+# config_file will be in the base directory
+DIR=${PWD}
+source $DIR/config-metawrap
+
+if [[ $? -ne 0 ]]; then
+	echo "cannot find config-metawrap file - something went wrong with the installation!"
+	exit 1
+fi
+
+echo "Scripts sourced from: $SOFT"
+echo "Modules sourced from: $PIPES"
 # runs CheckM mini-pipeline on a single folder of bins
 if [[ -d ${1}.checkm ]]; then rm -r ${1}.checkm; fi
 comm "Running CheckM on $1 bins"

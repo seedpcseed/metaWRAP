@@ -33,10 +33,11 @@ help_message () {
 	echo "	--parallel		run spades reassembly in parallel, but only using 1 thread per bin"
 	echo "";}
 
-comm () { ${SOFT}/print_comment.py "$1" "-"; }
-error () { ${SOFT}/print_comment.py "$1" "*"; exit 1; }
-warning () { ${SOFT}/print_comment.py "$1" "*"; }
-announcement () { ${SOFT}/print_comment.py "$1" "#"; }
+	comm () { ${PWD}/metawrap-scripts/print_comment.py "$1" "-"; }
+	error () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; exit 1; }
+	warning () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; }
+	announcement () { ${PWD}/metawrap-scripts/print_comment.py "$1" "#"; }
+
 
 # these functions are for parallelizing the reassembly
 open_sem(){
@@ -61,24 +62,22 @@ run_with_lock(){
 ########################               LOADING IN THE PARAMETERS                ########################
 ########################################################################################################
 
+echo "======================================="
+echo "Running reassemble_bins ${@:1}"
+echo "======================================="
+echo ""
 
-#${config_file} = ${1} && shift
-echo ""
-echo ""
-echo "---------------------------------------"
-echo "** Sourced config-metawrap from: ${1} **"
-source $1 && shift
-echo "---------------------------------------"
-echo ""
-echo "======================================="
-echo "Running reassembly ${@:1}"
-echo "======================================="
-echo ""
-echo "---------------------------------------"
-echo "Modules in: $PIPES"
-echo "Scripts in: $SOFT"
-echo "---------------------------------------"
-echo ""
+# config_file will be in the base directory
+DIR=${PWD}
+source $DIR/config-metawrap
+
+if [[ $? -ne 0 ]]; then
+	echo "cannot find config-metawrap file - something went wrong with the installation!"
+	exit 1
+fi
+
+echo "Scripts sourced from: $SOFT"
+echo "Modules sourced from: $PIPES"
 
 
 # default params

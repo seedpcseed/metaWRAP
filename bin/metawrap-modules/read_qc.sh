@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/bash
 
 ###########################################################################################################################################################
 #       	                                                                                                                                          #
@@ -31,31 +31,31 @@ error () { ${SOFT}/print_comment.py "$1" "*"; exit 1; }
 warning () { ${SOFT}/print_comment.py "$1" "*"; }
 announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
+comm () { ${PWD}/metawrap-scripts/print_comment.py "$1" "-"; }
+error () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; exit 1; }
+warning () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; }
+announcement () { ${PWD}/metawrap-scripts/print_comment.py "$1" "#"; }
 
 ########################################################################################################
 ########################               LOADING IN THE PARAMETERS                ########################
 ########################################################################################################
 
-#echo "This is $1 and $2 and $3 and combined ${@:2}"
-#echo ""
-
-#${config_file} = ${1} && shift
-echo ""
-echo ""
-echo "---------------------------------------"
-echo "** Sourced config-metawrap from: ${1} **"
-source $1 && shift
-echo "---------------------------------------"
-echo ""
 echo "======================================="
 echo "Running read_qc ${@:1}"
 echo "======================================="
 echo ""
-echo "---------------------------------------"
-echo "Modules in: $PIPES"
-echo "Scripts in: $SOFT"
-echo "---------------------------------------"
-echo ""
+
+# config_file will be in the base directory
+DIR=${PWD}
+source $DIR/config-metawrap
+
+if [[ $? -ne 0 ]]; then
+	echo "cannot find config-metawrap file - something went wrong with the installation!"
+	exit 1
+fi
+
+echo "Scripts sourced from: $SOFT"
+echo "Modules sourced from: $PIPES"
 
 # default params
 threads=1; out="false"; reads_1="false"; reads_2="false"
@@ -63,8 +63,6 @@ bmtagger=true; trim=true; pre_qc_report=true; post_qc_report=true
 HOST=hg38
 
 # load in params
-echo "This is 1: $1"
-echo ""
 OPTS=`getopt -o ht:o:1:2:x: --long help,skip-trimming,skip-bmtagger,skip-pre-qc-report,skip-post-qc-report -- "$@"`
 # make sure the params are entered correctly
 # if [ $? -ne 0 ]; then help_message; exit 1; fi

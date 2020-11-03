@@ -23,37 +23,31 @@ help_message () {
 	echo ""
 	echo "";}
 
-comm () { ${SOFT}/print_comment.py "$1" "-"; }
-error () { ${SOFT}/print_comment.py "$1" "*"; exit 1; }
-warning () { ${SOFT}/print_comment.py "$1" "*"; }
-announcement () { ${SOFT}/print_comment.py "$1" "#"; }
+	comm () { ${PWD}/metawrap-scripts/print_comment.py "$1" "-"; }
+	error () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; exit 1; }
+	warning () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; }
+	announcement () { ${PWD}/metawrap-scripts/print_comment.py "$1" "#"; }
 
+	########################################################################################################
+	########################               LOADING IN THE PARAMETERS                ########################
+	########################################################################################################
 
+	echo "======================================="
+	echo "Running quant_bins ${@:1}"
+	echo "======================================="
+	echo ""
 
-########################################################################################################
-########################               LOADING IN THE PARAMETERS                ########################
-########################################################################################################
+	# config_file will be in the base directory
+	DIR=${PWD}
+	source $DIR/config-metawrap
 
+	if [[ $? -ne 0 ]]; then
+		echo "cannot find config-metawrap file - something went wrong with the installation!"
+		exit 1
+	fi
 
-#${config_file} = ${1} && shift
-echo ""
-echo ""
-echo "---------------------------------------"
-echo "** Sourced config-metawrap from: ${1} **"
-source $1 && shift
-echo "---------------------------------------"
-echo ""
-echo "======================================="
-echo "Running quant_bins ${@:1}"
-echo "======================================="
-echo ""
-echo "---------------------------------------"
-echo "Modules in: $PIPES"
-echo "Scripts in: $SOFT"
-echo "---------------------------------------"
-echo ""
-
-
+	echo "Scripts sourced from: $SOFT"
+	echo "Modules sourced from: $PIPES"
 # default params
 threads=1; out=false; bin_folder=false; assembly=false
 # long options defaults
