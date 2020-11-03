@@ -1,5 +1,5 @@
-#!/usr/bin/env python2.7
-#! /usr/bin/env python
+#!/opt/conda/bin/python2.7
+
 """
 This script gathers & converts Salmon output counts into something that
 edgeR can read ("counts files").
@@ -51,7 +51,7 @@ def main():
                 outname = dirname + '.counts'
                 process_quant_file(root, filename, dirname + '.counts')
                 quantlist.append(outname)
-                
+
                 break
 
     print ",\n".join([ "\"%s\"" % i for i in sorted(quantlist)])

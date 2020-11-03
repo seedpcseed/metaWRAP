@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-
+#!/bin/bash
 ##############################################################################################################################################################
 #
 # This script is meant to be run on paired end reads (with extensions *_1.fastq and *_2.fastq) or assembled contigs (*.fa or *.fasta).

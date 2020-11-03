@@ -1,11 +1,11 @@
-#!/usr/bin/env python2.7
-#usage: 
+#!/opt/conda/bin/python2.7
+#usage:
 # bwa mem -a assembly.fa reads_1.fastq reads_2.fastq | ./filter_reads_for_bin_reassembly.py original_bin_folder reads_1.fastq reads_2.fastq output_dir
 import sys, os
 strict_snp_cutoff = int(sys.argv[3])
 permissive_snp_cutoff = int(sys.argv[4])
 
-complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'a':'t', 't':'a', 'c':'g', 'g':'c', 'N':'N', 'n':'n'} 
+complement = {'A': 'T', 'C': 'G', 'G': 'C', 'T': 'A', 'a':'t', 't':'a', 'c':'g', 'g':'c', 'N':'N', 'n':'n'}
 def rev_comp(seq):
 	rev_comp=""
 	for n in seq:
@@ -16,7 +16,7 @@ def rev_comp(seq):
 print "loading contig to bin mappings..."
 contig_bins={}
 for bin_file in os.listdir(sys.argv[1]):
-	if bin_file.endswith(".fa") or bin_file.endswith(".fasta"): 
+	if bin_file.endswith(".fa") or bin_file.endswith(".fasta"):
 		bin_name=".".join(bin_file.split("/")[-1].split(".")[:-1])
 		for line in open(sys.argv[1]+"/"+bin_file):
 			if line[0]!=">": continue
@@ -39,7 +39,7 @@ for line in sys.stdin:
 	elif binary_flag[-8]=="1":
 		R_line=line
 
-	# get fields for forward and reverse reads	
+	# get fields for forward and reverse reads
 	F_cut = F_line.strip().split("\t")
 	R_cut = R_line.strip().split("\t")
 
@@ -48,11 +48,11 @@ for line in sys.stdin:
 
 	# make sure the R and F reads aligned to the same bin
 	if F_cut[2] != R_cut[2]:
-		if F_cut[2] not in contig_bins or R_cut[2] not in contig_bins: 
+		if F_cut[2] not in contig_bins or R_cut[2] not in contig_bins:
 			continue
 		bin1 = contig_bins[F_cut[2]]
 		bin2 = contig_bins[R_cut[2]]
-		if bin1 != bin2: 
+		if bin1 != bin2:
 			continue
 		bin_name=bin1
 	else:
@@ -62,7 +62,7 @@ for line in sys.stdin:
 
 	# make sure the reads aligned again
 	if "NM:i:" not in F_line and "NM:i:" not in R_line: continue
-	
+
 	# open the revelant output files
 	if bin_name not in opened_bins:
 		opened_bins[bin_name]=None
@@ -112,5 +112,3 @@ for f in files:
 
 
 print "Finished splitting reads!"
-
-

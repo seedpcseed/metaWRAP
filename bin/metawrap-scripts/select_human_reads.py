@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 import sys
 
 # This script takes in the reads that are proposed by bmtagger to be human, and filteres them out of the original fastq file.
@@ -12,13 +12,8 @@ for line in open(sys.argv[1]):
 # only print the human reads
 skip=True
 for i, line in enumerate(open(sys.argv[2])):
-	if i%4==0: 
+	if i%4==0:
 		if line[1:].split("/")[0].split()[0] in human: skip=False
-		else: skip=True 
+		else: skip=True
 
 	if skip==False: print line.rstrip()
-
-
-
-
-

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 import sys
 
 #load in nodes.dmp
@@ -12,7 +12,7 @@ include=set(["species", "genus", "family", "order", "class", "phylum", "superkin
 #prune blast output to remove mappings without a rank and remove taxid columnn
 for  line in open(sys.argv[2]):
 	cut=line.strip().split('\t')
-	for i in range(len(cut)): 
+	for i in range(len(cut)):
 		cut[i]=cut[i].strip()
 	ids=cut[5]
 	if len(ids.split(';'))<1: continue

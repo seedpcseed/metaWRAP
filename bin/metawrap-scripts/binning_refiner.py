@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 
 # Copyright (C) 2017, Weizhi Song, Torsten Thomas.
 # songwz03@gmail.com

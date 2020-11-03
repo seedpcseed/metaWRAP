@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 # USAGE:
 # ./script file1.stats file2.stats file3.stats
 
@@ -39,14 +39,14 @@ for bin_set in data:
 print "Plotting completion data..."
 # MAKING THE PLOT PRETTY!!!!
 # set some color schemes
-tableau20 = [(214, 39, 40), (31, 119, 180), (255, 127, 14),    
-             (44, 160, 44), (255, 152, 150),    
-             (148, 103, 189), (197, 176, 213), (140, 86, 75), (196, 156, 148),    
-             (227, 119, 194), (247, 182, 210), (127, 127, 127), (199, 199, 199),    
+tableau20 = [(214, 39, 40), (31, 119, 180), (255, 127, 14),
+             (44, 160, 44), (255, 152, 150),
+             (148, 103, 189), (197, 176, 213), (140, 86, 75), (196, 156, 148),
+             (227, 119, 194), (247, 182, 210), (127, 127, 127), (199, 199, 199),
              (188, 189, 34), (219, 219, 141), (23, 190, 207), (158, 218, 229)]
 
-for i in range(len(tableau20)):    
-	r, g, b = tableau20[i]    
+for i in range(len(tableau20)):
+	r, g, b = tableau20[i]
 	tableau20[i] = (r / 255., g / 255., b / 255.)
 plot_colors={}
 for i, label in enumerate(sys.argv[1:]):
@@ -59,7 +59,7 @@ for i, label in enumerate(sys.argv[1:]):
 plt.figure(figsize=(16, 8))
 plt.style.use('ggplot')
 
-# Remove the plot frame lines. They are unnecessary chartjunk.    
+# Remove the plot frame lines. They are unnecessary chartjunk.
 ax = plt.subplot(121)
 ax.spines["top"].set_visible(False)
 ax.spines["bottom"].set_linewidth(0.5)
@@ -69,29 +69,29 @@ ax.spines["left"].set_visible(False)
 #ax.set_facecolor('white')
 ax.set_facecolor("white")
 
-# Ensure that the axis ticks only show up on the bottom and left of the plot.    
+# Ensure that the axis ticks only show up on the bottom and left of the plot.
 ax.get_xaxis().tick_bottom()
 ax.get_yaxis().tick_left()
 
-# Limit the range of the plot to only where the data is.    
+# Limit the range of the plot to only where the data is.
 plt.ylim(min_completion, 105)
 max_x=0
 for k in data:
 	if len(data[k])>max_x: max_x=len(data[k])
 plt.xlim(0, max_x)
 
-# Make sure your axis ticks are large enough to be easily read.    
-plt.yticks(range(min_completion, 105, 10), [str(x) + "%" for x in range(min_completion, 105, 10)], fontsize=14)    
-plt.xticks(fontsize=14)    
+# Make sure your axis ticks are large enough to be easily read.
+plt.yticks(range(min_completion, 105, 10), [str(x) + "%" for x in range(min_completion, 105, 10)], fontsize=14)
+plt.xticks(fontsize=14)
 
-# Provide tick lines across the plot to help your viewers trace along    
-for y in range(min_completion, 105, 10):    
+# Provide tick lines across the plot to help your viewers trace along
+for y in range(min_completion, 105, 10):
 	plt.axhline(y=y, linestyle="--", lw=0.5, color="black", alpha=0.3)
 for x in range(0, 1000, 20):
 	plt.axvline(x=x, linestyle="--", lw=0.5, color="black", alpha=0.3)
-  
-# Remove the tick marks; they are unnecessary with the tick lines we just plotted.    
-plt.tick_params(axis="both", which="both", bottom=False, top=False, labelbottom=True, left=False, right=False, labelleft=True)    
+
+# Remove the tick marks; they are unnecessary with the tick lines we just plotted.
+plt.tick_params(axis="both", which="both", bottom=False, top=False, labelbottom=True, left=False, right=False, labelleft=True)
 
 
 # PLOTTING THE DATA
@@ -111,7 +111,7 @@ for rank, bin_set in enumerate(labels):
 
 	# plot the data
 	plt.plot(data[bin_set], lw=2.5, color=c)
-	
+
 	# add bin set label to plot
 	for x_pos,y in enumerate(data[bin_set]):
 		if y<y_pos:
@@ -120,7 +120,7 @@ for rank, bin_set in enumerate(labels):
 	y_pos-=y_increment
 
 # add plot and axis titles and adjust edges
-plt.title("Bin completion ranking", fontsize=26) 
+plt.title("Bin completion ranking", fontsize=26)
 plt.xlabel("Descending completion rank", fontsize=16)
 plt.ylabel("Estimated bin completion", fontsize=16)
 
@@ -154,7 +154,7 @@ for bin_set in data:
 
 print "Plotting the contamination data..."
 # MAKING THE PLOT PRETTY!!!!
-# Remove the plot frame lines. They are unnecessary chartjunk.    
+# Remove the plot frame lines. They are unnecessary chartjunk.
 ax = plt.subplot(122)
 ax.spines["top"].set_visible(False)
 ax.spines["bottom"].set_linewidth(0.5)
@@ -164,11 +164,11 @@ ax.spines["left"].set_visible(False)
 #ax.set_facecolor('white')
 ax.set_facecolor("white")
 
-# Ensure that the axis ticks only show up on the bottom and left of the plot.    
+# Ensure that the axis ticks only show up on the bottom and left of the plot.
 ax.get_xaxis().tick_bottom()
 ax.get_yaxis().tick_left()
 
-# Limit the range of the plot to only where the data is.    
+# Limit the range of the plot to only where the data is.
 #plt.gca().invert_yaxis()
 plt.ylim(0, max_contamination+1)
 #ax.set_yscale('log')
@@ -187,9 +187,9 @@ for y in range(0, max_contamination+1, 1):
 for x in range(0, 1000, 20):
         plt.axvline(x=x, linestyle="--", lw=0.5, color="black", alpha=0.3)
 
- 
-# Remove the tick marks; they are unnecessary with the tick lines we just plotted.    
-plt.tick_params(axis="both", which="both", bottom=False, top=False, labelbottom=True, left=False, right=False, labelleft=True)    
+
+# Remove the tick marks; they are unnecessary with the tick lines we just plotted.
+plt.tick_params(axis="both", which="both", bottom=False, top=False, labelbottom=True, left=False, right=False, labelleft=True)
 
 
 # PLOTTING THE DATA
@@ -218,7 +218,7 @@ for rank, bin_set in enumerate(labels):
 
 
 # add plot and axis titles and adjust the edges
-plt.title("Bin contamination ranking", fontsize=26) 
+plt.title("Bin contamination ranking", fontsize=26)
 plt.xlabel("Acending contamination rank", fontsize=16)
 plt.ylabel("Estimated bin contamination (log scale)", fontsize=16)
 plt.gcf().subplots_adjust(right=0.9)
@@ -229,9 +229,3 @@ plt.tight_layout(w_pad=10)
 plt.subplots_adjust(top=0.92, right=0.90, left=0.08)
 plt.savefig("binning_results.png",format='png', dpi=300)
 #plt.show()
-
-
-
-
-
-

@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 print "loading libs..."
 import sys
 import numpy as np
@@ -28,7 +28,7 @@ def load_data(filename):
 
 	# remove all 0 rows
 	df = df[(df.T != 0).any()]
-	
+
 	# standardize columns by total sum in each column
 	df = df.div(df.sum(axis=0), axis=1)
 	df=1000000*df
@@ -80,5 +80,3 @@ else: out=sys.argv[2]
 
 
 plt.savefig(out, bbox_inches='tight', dpi=300)
-
-

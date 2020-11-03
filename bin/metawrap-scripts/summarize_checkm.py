@@ -1,10 +1,10 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 import sys
-# This script summarizes the statistics of each bin by parsing 
+# This script summarizes the statistics of each bin by parsing
 # the checkm_folder/storage/bin_stats_ext.tsv file of the CheckM output
 
 
-if len(sys.argv)==3: 
+if len(sys.argv)==3:
 	binner=sys.argv[2]
 	print "bin\tcompleteness\tcontamination\tGC\tlineage\tN50\tsize\tbinner"
 elif len(sys.argv)==4:
@@ -26,7 +26,7 @@ for line in open(sys.argv[1]):
 	name=line.split("\t")[0]
 
 
-	if len(sys.argv)==3:	
+	if len(sys.argv)==3:
 		print "\t".join([name, str(dic["Completeness"])[:5],\
 		 str(dic["Contamination"])[:5], str(dic["GC"])[:5],\
 		 dic["marker lineage"], str(dic["N50 (contigs)"]),\

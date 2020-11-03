@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 import sys, os
 import numpy as np
 
@@ -14,7 +14,7 @@ contig_lengths={}
 length=0
 for line in open(sys.argv[3]):
 	if line[0]==">":
-		if length!=0: 
+		if length!=0:
 			contig_lengths[contig]=length
 		length=0
 		contig=line[1:-1].split()[0]
@@ -49,14 +49,14 @@ for salmon_file in os.listdir(sys.argv[1]):
 			bin_abundances[bin]["cov_list"].append(abun)
 		bin_abundances[bin]["total_len"]+=contig_lengths[line.split("\t")[0]]
 		bin_abundances[bin]["total_cov"]+=abun * contig_lengths[line.split("\t")[0]]
-	
+
 	if ct==0:
 		sys.stderr.write("\nNone of the contigs/scaffolds in the -a metagenomic assembly file were present in the bin files. Please make sure that the bins and total assembly have the exact same bins. One cause for this could be that you reassembled the bins, disrupring the contig naming. If you do not have the original total metagenomic assembly file, then you could not provide the -a option at all (but this is not ideal for abundance estimation).\n")
 		sys.exit(1)
 		quit()
 
 	for bin in bin_abundances:
-		#bin_abundances[bin]["samples"][sample]=bin_abundances[bin]["total_cov"] / bin_abundances[bin]["total_len"]	
+		#bin_abundances[bin]["samples"][sample]=bin_abundances[bin]["total_cov"] / bin_abundances[bin]["total_len"]
 		bin_abundances[bin]["samples"][sample] = np.median(bin_abundances[bin]["cov_list"])
 		#bin_abundances[bin]["samples"][sample] = sum(bin_abundances[bin]["cov_list"])
                 bin_abundances[bin]["total_len"]=0
@@ -65,7 +65,7 @@ for salmon_file in os.listdir(sys.argv[1]):
 
 
 first=True
-for bin in bin_abundances: 
+for bin in bin_abundances:
 	if first==True:
 		sys.stdout.write('Genomic bins')
 		for sample in bin_abundances[bin]["samples"]:
@@ -76,7 +76,3 @@ for bin in bin_abundances:
 	for sample in bin_abundances[bin]["samples"]:
 		sys.stdout.write("\t" + str(bin_abundances[bin]["samples"][sample]))
 	print ""
-
-
-
-

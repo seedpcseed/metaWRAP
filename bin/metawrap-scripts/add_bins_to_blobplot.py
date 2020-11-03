@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 # THis script takes in a blobplot text file and and number of bins as input, and annotates
 # each line in the blob file with its bin name (if that contig exists in one of the bins)
 
@@ -26,4 +26,3 @@ for line in open(sys.argv[1]):
 
 	else:
 		print "\t".join([line.strip(), "Unbinned", "Unbinned", "Unbinned"])
-

@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-
+#!/bin/bash
 ##############################################################################################################################################################
 #
 # This script takes in a set of bins and any number of paired-end read sets from metagenomic samples, and estimates the abundance of each bin in each

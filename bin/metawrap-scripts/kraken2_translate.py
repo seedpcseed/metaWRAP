@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/opt/conda/bin/python2.7
 import sys
 import os
 
@@ -105,17 +105,16 @@ def main():
     Returns: None
 
     """
-	
+
     database_location = sys.argv[1]
     kraken_file = sys.argv[2]
     output_file = sys.argv[3]
     print("Translating kraken2 annotations from %s, using metadata from the kraken2 database in %s; saving to %s" \
           % (kraken_file, database_location, output_file))
     translate_kraken2_annotations(annotation_file=kraken_file, kraken2_db=database_location, output=output_file)
-    
+
 
 if __name__ == '__main__':
     """ Launch script
     """
     main()
-

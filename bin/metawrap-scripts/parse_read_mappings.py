@@ -1,11 +1,11 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 import sys, os
 
 
 # load bin contigs
 contig_bins={}
 for bin_file in os.listdir(sys.argv[1]):
-	if bin_file.endswith(".fa") or bin_file.endswith(".fasta"): 
+	if bin_file.endswith(".fa") or bin_file.endswith(".fasta"):
 		bin_name=".".join(bin_file.split("/")[-1].split(".")[:-1])
 		for line in open(sys.argv[1]+"/"+bin_file):
 			if line[0]!=">": continue
@@ -26,4 +26,3 @@ for line in sys.stdin:
 	mappings[read][1][contig_bins[contig]]=None
 
 print mappings
-

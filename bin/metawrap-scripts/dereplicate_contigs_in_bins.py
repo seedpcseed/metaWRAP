@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 import sys, os
 
 # Usage: ./script.py bins.stats binsFolder outFolder
@@ -21,14 +21,14 @@ for bin_file in os.listdir(sys.argv[2]):
 		if line[0]!=">": continue
 		contig=line[1:-1]
 		if contig not in contig_mapping: contig_mapping[contig]=bin_name
-		else: 
+		else:
 			if len(sys.argv)>4:
 				if sys.argv[4]=="remove": contig_mapping[contig]=None
-			elif bin_scores[bin_name]>bin_scores[contig_mapping[contig]]: 
+			elif bin_scores[bin_name]>bin_scores[contig_mapping[contig]]:
 				contig_mapping[contig]=bin_name
 
 
-# go over the bin files again and make a new dereplicated version of each bin file	
+# go over the bin files again and make a new dereplicated version of each bin file
 print "Making a new dereplicated version of each bin file"
 os.system("mkdir "+sys.argv[3])
 for bin_file in os.listdir(sys.argv[2]):
@@ -38,13 +38,11 @@ for bin_file in os.listdir(sys.argv[2]):
         for line in open(sys.argv[2]+"/"+bin_file):
 		if line[0]==">":
 			contig=line[1:-1]
-			if contig_mapping[contig]==bin_name: 
+			if contig_mapping[contig]==bin_name:
 				at_least_one=True
 				store=True
 			else: store=False
 		if store==True: out.write(line)
-	out.close()	
+	out.close()
 	if at_least_one==False:
 		os.system("rm " + sys.argv[3] + "/" + bin_file)
-
-

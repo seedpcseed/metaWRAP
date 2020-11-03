@@ -1,5 +1,5 @@
-#!/bin/bash -l
-#
+#!/bin/bash
+
 #SBATCH
 #SBATCH --partition=shared
 #SBATCH --job-name=CheckM

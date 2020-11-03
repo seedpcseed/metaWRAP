@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 # encoding:utf8
 # authors: Erik Garrison, Sébastien Boisvert
 """This script takes two fastq or fastq.gz files and interleaves them
@@ -16,10 +16,10 @@ def interleave(f1, f2):
         if line.strip() == "":
             break
         print line.strip()
-        
+
         for i in xrange(3):
             print f1.readline().strip()
-        
+
         for i in xrange(4):
             print f2.readline().strip()
 
@@ -40,4 +40,3 @@ if __name__ == '__main__':
         with open(file1) as f1:
             with open(file2) as f2:
                 interleave(f1, f2)
-

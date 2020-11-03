@@ -1,8 +1,8 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 import sys, os
 
 '''
-This script takes in two folders containing bins from two binning methods, and their complementary 
+This script takes in two folders containing bins from two binning methods, and their complementary
 contamination and completion scores derived from CheckM, then matches corresponding bins in the two
 sets based on a minimum of 80% overlap (by length) of the bins, and finally, decides which of the two
 bin versions is best in that particular bin.
@@ -46,7 +46,7 @@ for bin_file in good_bins_2:
         bins_2[bin_file]={}
         for line in open(sys.argv[2] + '/' + bin_file):
                 if not line.startswith('>'): continue
-                bins_2[bin_file][line[1:-1]] = int(line.split('_')[3])	
+                bins_2[bin_file][line[1:-1]] = int(line.split('_')[3])
 '''
 
 
@@ -70,7 +70,7 @@ for bin_file in good_bins_2:
 	contig_name=""
         bins_2[bin_file]={}
         for line in open(sys.argv[2] + '/' + bin_file):
-                if not line.startswith('>'): 
+                if not line.startswith('>'):
 			contig_len+=len(line.strip())
                 else:
 			if contig_name!="":
@@ -113,7 +113,7 @@ bins_2_stats={}
 bins_1_summary={}
 bins_2_summary={}
 for line in open(sys.argv[3]):
-	if "completeness" in line: 
+	if "completeness" in line:
 		bins_1_summary["header"]=line
 		continue
 	cut=line.strip().split('\t')
@@ -121,7 +121,7 @@ for line in open(sys.argv[3]):
 	bins_1_summary[cut[0]+'.fa']=line
 
 for line in open(sys.argv[4]):
-        if "completeness" in line: 
+        if "completeness" in line:
 		bins_2_summary["header"]=line
 		continue
         cut=line.strip().split('\t')
@@ -148,7 +148,7 @@ for bin_1 in all_bin_pairs:
 			cmd = "cp " + sys.argv[2] + '/' + bin_2 + " " + sys.argv[5] + "/bin." + str(bin_ct) + ".fa"
 			new_summary_file+="bin." + str(bin_ct) + "\t" + "\t".join(bins_2_summary[bin_2].split("\t")[1:])
 			found_better=True
-	if found_better==False: 
+	if found_better==False:
 		new_summary_file+="bin." + str(bin_ct) + "\t" + "\t".join(bins_1_summary[bin_1].split("\t")[1:])
 		cmd = "cp " + sys.argv[1] + '/' + bin_1 + " " + sys.argv[5] + "/bin." + str(bin_ct) + ".fa"
 	os.system(cmd)
@@ -164,9 +164,7 @@ for bin_2 in bins_2_stats:
 	bin_ct+=1
 
 
-f = open(sys.argv[5]+".stats", 'w') 
-f.write(new_summary_file) 
+f = open(sys.argv[5]+".stats", 'w')
+f.write(new_summary_file)
 
 print "There were " + str(bin_ct) + " bins cherry-picked from the original sets!"
-
-

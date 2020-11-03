@@ -1,4 +1,4 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 # This script prints any comment in a structured and prety way.
 import sys
 comm=sys.argv[1]

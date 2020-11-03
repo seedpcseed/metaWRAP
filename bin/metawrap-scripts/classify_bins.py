@@ -1,8 +1,8 @@
-#!/usr/bin/env python2.7
+#!/opt/conda/bin/python2.7
 import sys,os
 
 def add_to_tree( tree, tax_list, length ):
-	if len(tax_list)==0: return tree 
+	if len(tax_list)==0: return tree
 	else:
 		if tax_list[0] not in tree: tree[tax_list[0]]=[length, {}]
 		else: tree[tax_list[0]][0]+=length
@@ -17,7 +17,7 @@ def traverse(tree, taxonomy, weight):
 	max_class=""
 	for k in tree:
 		total_score+=tree[k][0]
-		if tree[k][0]>max_score: 
+		if tree[k][0]>max_score:
 			max_score=tree[k][0]
 			max_class=k
 	if weight!=0: total_score=weight
@@ -46,7 +46,7 @@ for filename in os.listdir(sys.argv[2]):
 		if line[0]=='>' and length==0:
 			contig=line[1:-1]
 		elif line[0]=='>' and length>0:
-			if contig in taxonomy: 
+			if contig in taxonomy:
 				#print "\t".join([contig, str(length), taxonomy[contig]])
 				taxcut=taxonomy[contig].split(';')
 				tax_tree = add_to_tree(tax_tree, taxcut, length)
@@ -61,4 +61,3 @@ for filename in os.listdir(sys.argv[2]):
 	#print tax_tree
 	consensus=traverse(tax_tree, [], 0)
 	print filename + "\t" + ";".join(consensus)
-

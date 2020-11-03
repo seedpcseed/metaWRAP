@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-
+#!/bin/bash
 ##############################################################################################################################################################
 #
 # This script is meant to be run on the outputs of assembly.sh pipeline to split the assembly contigs into metagenomic bins.
