@@ -1,5 +1,5 @@
 PIPES="$DIR/metawrap-modules"
-SOFT="$DIR/metwrap-scripts"
+SOFT="$DIR/metawrap-scripts"
 
 # OPTIONAL databases (see 'Databases' section of metaWRAP README for details)
 # path to kraken standard databases

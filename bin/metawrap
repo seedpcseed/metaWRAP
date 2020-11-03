@@ -32,6 +32,7 @@ help_message () {
 # config_file will be in the base directory
 DIR=$(dirname $(readlink -f $0))
 source $DIR/config-metawrap
+echo "Config file sourced: $DIR/config-metawrap"
 
 if [[ $? -ne 0 ]]; then
 	echo "cannot find config-metawrap file - something went wrong with the installation!"
