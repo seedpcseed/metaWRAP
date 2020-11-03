@@ -1,4 +1,4 @@
-#!/bin/bash -l
+#!/usr/bin/env bash -l
 #
 #SBATCH
 #SBATCH --partition=lrgmem

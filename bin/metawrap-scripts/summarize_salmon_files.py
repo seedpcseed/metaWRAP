@@ -1,4 +1,4 @@
-#!/opt/conda/bin/python2.7
+#!/usr/bin/env python2.72.7
 #! /usr/bin/env python
 """
 This script gathers & converts Salmon output counts into something that

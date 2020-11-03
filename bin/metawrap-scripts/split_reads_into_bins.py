@@ -1,4 +1,4 @@
-#!/opt/conda/bin/python2.7
+#!/usr/bin/env python2.72.7
 # Usage: ./script mapping_file.dict reads_1.fastq reads_2.fastq output_dir
 import sys, os
 

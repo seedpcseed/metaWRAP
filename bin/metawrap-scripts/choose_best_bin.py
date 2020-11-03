@@ -1,4 +1,4 @@
-#!/opt/conda/bin/python2.7
+#!/usr/bin/env python2.72.7
 import sys
 
 # This script takes in the reassembled_bins.stats file of the binning module and choses the best possible

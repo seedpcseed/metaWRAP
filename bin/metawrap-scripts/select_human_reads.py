@@ -1,4 +1,4 @@
-#!/opt/conda/bin/python2.7
+#!/usr/bin/env python2.72.7
 import sys
 
 # This script takes in the reads that are proposed by bmtagger to be human, and filteres them out of the original fastq file.
