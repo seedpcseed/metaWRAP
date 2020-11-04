@@ -41,7 +41,7 @@ echo "======================================="
 echo ""
 
 # config_file will be in the base directory
-if [ !-z "$CONFIG" ]; then
+if [ ! -z "$CONFIG" ]; then
   source $CONFIG
   echo "Config file sourced: $CONFIG"
 else
