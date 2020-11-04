@@ -25,8 +25,14 @@ echo "======================================="
 echo ""
 
 # config_file will be in the base directory
-DIR=${PWD}
-source $DIR/config-metawrap
+# config_file will be in the base directory
+if [ ! -z "$CONFIG" ]; then
+  source $CONFIG
+  echo "Config file sourced: $CONFIG"
+else
+  source $DIR/config-metawrap
+  echo "Config file sourced: $DIR/config-metawrap"
+fi
 
 if [[ $? -ne 0 ]]; then
 	echo "cannot find config-metawrap file - something went wrong with the installation!"
@@ -35,6 +41,7 @@ fi
 
 echo "Scripts sourced from: $SOFT"
 echo "Modules sourced from: $PIPES"
+
 # runs CheckM mini-pipeline on a single folder of bins
 if [[ -d ${1}.checkm ]]; then rm -r ${1}.checkm; fi
 comm "Running CheckM on $1 bins"

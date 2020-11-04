@@ -40,8 +40,14 @@ help_message () {
 	echo ""
 
 	# config_file will be in the base directory
-	DIR=${PWD}
-	source $DIR/config-metawrap
+	# config_file will be in the base directory
+	if [ ! -z "$CONFIG" ]; then
+	  source $CONFIG
+	  echo "Config file sourced: $CONFIG"
+	else
+	  source $DIR/config-metawrap
+	  echo "Config file sourced: $DIR/config-metawrap"
+	fi
 
 	if [[ $? -ne 0 ]]; then
 		echo "cannot find config-metawrap file - something went wrong with the installation!"
@@ -50,6 +56,7 @@ help_message () {
 
 	echo "Scripts sourced from: $SOFT"
 	echo "Modules sourced from: $PIPES"
+
 # Set defaults
 threads=1; out="false"; n_contigs="false";
 ASSEMBLY="false"; bin_folder=false
