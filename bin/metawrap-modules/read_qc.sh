@@ -31,11 +31,6 @@ error () { ${SOFT}/print_comment.py "$1" "*"; exit 1; }
 warning () { ${SOFT}/print_comment.py "$1" "*"; }
 announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
-comm () { ${PWD}/metawrap-scripts/print_comment.py "$1" "-"; }
-error () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; exit 1; }
-warning () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; }
-announcement () { ${PWD}/metawrap-scripts/print_comment.py "$1" "#"; }
-
 ########################################################################################################
 ########################               LOADING IN THE PARAMETERS                ########################
 ########################################################################################################
@@ -46,8 +41,13 @@ echo "======================================="
 echo ""
 
 # config_file will be in the base directory
-DIR=${PWD}
-source $DIR/config-metawrap
+if [ !-z "$CONFIG" ]; then
+  source $CONFIG
+  echo "Config file sourced: $CONFIG"
+else
+  source $DIR/config-metawrap
+  echo "Config file sourced: $DIR/config-metawrap"
+fi
 
 if [[ $? -ne 0 ]]; then
 	echo "cannot find config-metawrap file - something went wrong with the installation!"

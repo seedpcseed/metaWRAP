@@ -29,13 +29,14 @@ help_message () {
 	echo "	--show-config	show where the metawrap configuration files are stored"
         echo "";}
 
+
 # config_file will be in the base directory
-if [[!-z "$CONFIG"]]; then
+if [ ! -z "$CONFIG" ]; then
   source $CONFIG
-  echo "Config file sourced: $CONFIG"
+  echo "Config file sourced from launch: $CONFIG"
 else
-  source $DIR/config-metawrap
-  echo "Config file sourced: $DIR/config-metawrap"
+  source /opt/conda/config-metawrap
+  echo "Config file sourced from container: /opt/conda/bin/config-metawrap"
 fi
 
 if [[ $? -ne 0 ]]; then
