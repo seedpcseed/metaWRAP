@@ -27,18 +27,19 @@ help_message () {
 	echo "	-a STR          metagenomic assembly file"
 	echo "	-o STR          output directory"
 	echo "	-t INT          number of threads (default=1)"
-	echo "	-m INT		amount of RAM available (default=4)"
-	echo "	-l INT		minimum contig length to bin (default=1000bp). Note: metaBAT will default to 1500bp minimum"
+	echo "	-m INT					amount of RAM available (default=4)"
+	echo "	-l INT					minimum contig length to bin (default=1000bp). Note: metaBAT will default to 1500bp minimum"
+	echo "  -r STR 					read type (default=paired)"
 	echo ""
-        echo "	--metabat2      bin contigs with metaBAT2"
-	echo "	--metabat1	bin contigs with the original metaBAT"
-	echo "	--maxbin2	bin contigs with MaxBin2"
-	echo "	--concoct	bin contigs with CONCOCT"
+  echo "	--metabat2      bin contigs with metaBAT2"
+	echo "	--metabat1			bin contigs with the original metaBAT"
+	echo "	--maxbin2				bin contigs with MaxBin2"
+	echo "	--concoct				bin contigs with CONCOCT"
 	echo ""
-	echo "	--universal	use universal marker genes instead of bacterial markers in MaxBin2 (improves Archaea binning)"
-	echo "	--run-checkm	immediately run CheckM on the bin results (requires 40GB+ of memory)"
-	echo "	--single-end	non-paired reads mode (provide *.fastq files)"
-	echo "	--interleaved	the input read files contain interleaved paired-end reads"
+	echo "	--universal			use universal marker genes instead of bacterial markers in MaxBin2 (improves Archaea binning)"
+	echo "	--run-checkm		immediately run CheckM on the bin results (requires 40GB+ of memory)"
+	echo "	--single-end		non-paired reads mode (provide *.fastq files)"
+	echo "	--interleaved		the input read files contain interleaved paired-end reads"
 	echo "";}
 	comm () { ${PWD}/metawrap-scripts/print_comment.py "$1" "-"; }
 	error () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; exit 1; }
@@ -78,20 +79,8 @@ echo "Running binning ${@:1}"
 echo "======================================="
 echo ""
 
-# config_file will be in the base directory
-# config_file will be in the base directory
-if [ ! -z "$CONFIG" ]; then
-  source $CONFIG
-  echo "Config file sourced: $CONFIG"
-else
-  source $DIR/config-metawrap
-  echo "Config file sourced: $DIR/config-metawrap"
-fi
-
-if [[ $? -ne 0 ]]; then
-	echo "cannot find config-metawrap file - something went wrong with the installation!"
-	exit 1
-fi
+SOFT = ./scripts
+PIPES = ./modules
 
 echo "Scripts sourced from: $SOFT"
 echo "Modules sourced from: $PIPES"
@@ -104,28 +93,29 @@ checkm=false; read_type=paired
 markers=107
 
 # load in params
-# OPTS=`getopt -o ht:m:o:a:l: --long help,metabat1,metabat2,maxbin2,concoct,run-checkm,single-end,universal,interleaved,config-metawrap -- "$@"`
+OPTS=`getopt -o ht:m:o:a:l: --long help,metabat1,metabat2,maxbin2,concoct,run-checkm,single-end,universal,interleaved -- "$@"`
+
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
 # loop through input params
 while true; do
         case "$1" in
-								--config-metawrap) shift 2;;
-                -t) threads=$2; shift 2;;
+								-t) threads=$2; shift 2;;
 								-m) mem=$2; shift 2;;
                 -o) out=$2; shift 2;;
                 -a) ASSEMBLY=$2; shift 2;;
 								-l) len=$2; shift 2;;
+								-r) read_type=$2; shift 2;;
                 -h | --help) help_message; exit 1; shift 1;;
-		--metabat2) metabat2=true; shift 1;;
-		--metabat1) metabat1=true; shift 1;;
-		--maxbin2) maxbin2=true; shift 1;;
-		--concoct) concoct=true; shift 1;;
-		--run-checkm) checkm=true; shift 1;;
-		--single-end) read_type=single; shift 1;;
-		--interleaved) read_type=interleaved; shift 1;;
-		--universal) markers=40; shift 1;;
-                --) help_message; exit 1; shift; break ;;
+								--metabat2) metabat2=true; shift 1;;
+								--metabat1) metabat1=true; shift 1;;
+								--maxbin2) maxbin2=true; shift 1;;
+								--concoct) concoct=true; shift 1;;
+								--run-checkm) checkm=true; shift 1;;
+								--single-end) read_type=single; shift 1;;
+								--interleaved) read_type=interleaved; shift 1;;
+								--universal) markers=40; shift 1;;
+						    --) help_message; exit 1; shift; break ;;
                 *) break;;
         esac
 done
@@ -368,7 +358,7 @@ if [ $maxbin2 = true ]; then
 	run_MaxBin.pl
 	if [[ $? -ne 0 ]]; then
 		comm "looks like our default perl libraries are not the conda ones. Manually setting perl5 library directory"
-        	conda_path=$(which metawrap)
+        	conda_path= /opt/conda
 		echo "metawrap path: $conda_path"
 		conda_path=${conda_path%/*}
 		if [ $(echo -n $conda_path | tail -c 1) = "/" ]; then conda_path=${conda_path%/*}; fi

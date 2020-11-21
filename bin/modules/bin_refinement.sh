@@ -69,20 +69,8 @@ echo "Running read_qc ${@:1}"
 echo "======================================="
 echo ""
 
-# config_file will be in the base directory
-# config_file will be in the base directory
-if [ ! -z "$CONFIG" ]; then
-  source $CONFIG
-  echo "Config file sourced: $CONFIG"
-else
-  source $DIR/config-metawrap
-  echo "Config file sourced: $DIR/config-metawrap"
-fi
-
-if [[ $? -ne 0 ]]; then
-	echo "cannot find config-metawrap file - something went wrong with the installation!"
-	exit 1
-fi
+SOFT = ./scripts
+PIPES = ./modules
 
 echo "Scripts sourced from: $SOFT"
 echo "Modules sourced from: $PIPES"
@@ -94,29 +82,29 @@ bins1=None; bins2=None; bins3=None
 run_checkm=true; refine=true; cherry_pick=true; dereplicate=partial; quick=false
 
 # load in params
-# OPTS=`getopt -o ht:m:o:x:c:A:B:C: --long help,skip-checkm,skip-refinement,skip-consolidation,keep-ambiguous,remove-ambiguous,quick,config-metawrap -- "$@"`
+OPTS=`getopt -o ht:m:o:x:c:A:B:C: --long help,skip-checkm,skip-refinement,skip-consolidation,keep-ambiguous,remove-ambiguous,quick -- "$@"`
+
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
 # loop through input params
 while true; do
         case "$1" in
-								--config-metawrap) shift 2;;
-                -t) threads=$2; shift 2;;
-		-m) mem=$2; shift 2;;
+								-t) threads=$2; shift 2;;
+								-m) mem=$2; shift 2;;
                 -o) out=$2; shift 2;;
-		-x) cont=$2; shift 2;;
-		-c) comp=$2; shift 2;;
-		-A) bins1=$2; shift 2;;
-		-B) bins2=$2; shift 2;;
-		-C) bins3=$2; shift 2;;
+								-x) cont=$2; shift 2;;
+								-c) comp=$2; shift 2;;
+								-A) bins1=$2; shift 2;;
+								-B) bins2=$2; shift 2;;
+								-C) bins3=$2; shift 2;;
                 -h | --help) help_message; exit 0; shift 1;;
-		--skip-checkm) run_checkm=false; shift 1;;
-		--skip-refinement) refine=false; shift 1;;
-		--skip-consolidation) cherry_pick=false; shift 1;;
-		--keep-ambiguous) dereplicate=false; shift 1;;
-		--remove-ambiguous) dereplicate=complete; shift 1;;
-		--quick) quick=true; shift 1;;
+								--skip-checkm) run_checkm=false; shift 1;;
+								--skip-refinement) refine=false; shift 1;;
+								--skip-consolidation) cherry_pick=false; shift 1;;
+								--keep-ambiguous) dereplicate=false; shift 1;;
+								--remove-ambiguous) dereplicate=complete; shift 1;;
+								--quick) quick=true; shift 1;;
                 --) help_message; exit 1; shift; break ;;
                 *) break;;
         esac

@@ -67,55 +67,44 @@ echo "Running reassemble_bins ${@:1}"
 echo "======================================="
 echo ""
 
-# config_file will be in the base directory
-# config_file will be in the base directory
-if [ ! -z "$CONFIG" ]; then
-  source $CONFIG
-  echo "Config file sourced: $CONFIG"
-else
-  source $DIR/config-metawrap
-  echo "Config file sourced: $DIR/config-metawrap"
-fi
-
-if [[ $? -ne 0 ]]; then
-	echo "cannot find config-metawrap file - something went wrong with the installation!"
-	exit 1
-fi
+SOFT = ./scripts
+PIPES = ./modules
 
 echo "Scripts sourced from: $SOFT"
 echo "Modules sourced from: $PIPES"
 
-
 # default params
 threads=1; mem=40; comp=70; cont=10; len=500
 bins=None; f_reads=None; r_reads=None; out=None
+
 # long options defaults
 strict_max=2; permissive_max=5
 run_checkm=true
 run_parallel=false
+
 # load in params
-# OPTS=`getopt -o ht:m:o:x:c:l:b:1:2: --long help,parallel,skip-checkm,strict-cut-off,permissive-cut-off,config-metawrap -- "$@"`
+OPTS=`getopt -o ht:m:o:x:c:l:b:1:2: --long help,parallel,skip-checkm,strict-cut-off,permissive-cut-off -- "$@"`
+
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
 # loop through input params
 while true; do
         case "$1" in
-								--config-metawrap) shift 2;;
                 -t) threads=$2; shift 2;;
                 -m) mem=$2; shift 2;;
                 -o) out=$2; shift 2;;
-		-x) cont=$2; shift 2;;
-		-c) comp=$2; shift 2;;
-		-b) bins=$2; shift 2;;
-		-l) len=$2; shift 2;;
-		-1) f_reads=$2; shift 2;;
-		-2) r_reads=$2; shift 2;;
+								-x) cont=$2; shift 2;;
+								-c) comp=$2; shift 2;;
+								-b) bins=$2; shift 2;;
+								-l) len=$2; shift 2;;
+								-1) f_reads=$2; shift 2;;
+								-2) r_reads=$2; shift 2;;
                 -h | --help) help_message; exit 0; shift 1;;
-		--strict-cut-off) strict_max=$2; shift 2;;
-		--permissive-cut-off) permissive_max=$2; shift 2;;
-		--skip-checkm) run_checkm=false; shift 1;;
-		--parallel) run_parallel=true; shift 1;;
+								--strict-cut-off) strict_max=$2; shift 2;;
+								--permissive-cut-off) permissive_max=$2; shift 2;;
+								--skip-checkm) run_checkm=false; shift 1;;
+								--parallel) run_parallel=true; shift 1;;
                 --) help_message; exit 1; shift; break ;;
                 *) break;;
         esac

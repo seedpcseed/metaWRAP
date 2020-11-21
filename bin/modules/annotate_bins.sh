@@ -35,20 +35,8 @@ help_message () {
 	echo "======================================="
 	echo ""
 
-	# config_file will be in the base directory
-	# config_file will be in the base directory
-	if [ ! -z "$CONFIG" ]; then
-	  source $CONFIG
-	  echo "Config file sourced: $CONFIG"
-	else
-	  source $DIR/config-metawrap
-	  echo "Config file sourced: $DIR/config-metawrap"
-	fi
-
-	if [[ $? -ne 0 ]]; then
-		echo "cannot find config-metawrap file - something went wrong with the installation!"
-		exit 1
-	fi
+	SOFT = ./scripts
+	PIPES = ./modules
 
 	echo "Scripts sourced from: $SOFT"
 	echo "Modules sourced from: $PIPES"
@@ -57,14 +45,14 @@ help_message () {
 threads=1; bins=None; out=None
 
 # load in params
-OPTS=`getopt -o ht:o:b: --long config-metawrap help -- "$@"`
+OPTS=`getopt -o ht:o:b: --long help -- "$@"`
+
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
 # loop through input params
 while true; do
         case "$1" in
-								--config-metawrap) shift 2;;
                 -t) threads=$2; shift 2;;
                 -o) out=$2; shift 2;;
 		-b) bins=$2; shift 2;;

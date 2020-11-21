@@ -18,7 +18,8 @@ help_message () {
 	echo "	-2 STR          reverse fastq reads"
 	echo "	-o STR          output directory"
 	echo "	-t INT          number of threads (default=1)"
-	echo "	-x STR		prefix of host index in bmtagger database folder (default=hg38)"
+	echo "	-x STR					prefix of host index in bmtagger database folder (default=hg38)"
+	echo "  -d STR          folder path for bmtagger databsase"
 	echo ""
 	echo "	--skip-bmtagger		dont remove human sequences with bmtagger"
 	echo "	--skip-trimming		dont trim sequences with trimgalore"
@@ -40,22 +41,8 @@ echo "Running read_qc ${@:1}"
 echo "======================================="
 echo ""
 
-# config_file will be in the base directory
-if [ ! -z "$CONFIG" ]; then
-  source $CONFIG
-  echo "Config file sourced: $CONFIG"
-else
-  source $DIR/config-metawrap
-  echo "Config file sourced: $DIR/config-metawrap"
-fi
-
-if [[ $? -ne 0 ]]; then
-	echo "cannot find config-metawrap file - something went wrong with the installation!"
-	exit 1
-fi
-
-echo "Scripts sourced from: $SOFT"
-echo "Modules sourced from: $PIPES"
+SOFT = ./scripts
+PIPES = ./modules
 
 # default params
 threads=1; out="false"; reads_1="false"; reads_2="false"
@@ -63,7 +50,7 @@ bmtagger=true; trim=true; pre_qc_report=true; post_qc_report=true
 HOST=hg38
 
 # load in params
-OPTS=`getopt -o ht:o:1:2:x: --long help,skip-trimming,skip-bmtagger,skip-pre-qc-report,skip-post-qc-report -- "$@"`
+OPTS=`getopt -o ht:o:1:2:x:d: --long help,skip-trimming,skip-bmtagger,skip-pre-qc-report,skip-post-qc-report -- "$@"`
 # make sure the params are entered correctly
 # if [ $? -ne 0 ]; then help_message; exit 1; fi
 
@@ -75,6 +62,7 @@ while true; do
 		-1) reads_1=$2; shift 2;;
 		-2) reads_2=$2; shift 2;;
 		-x) HOST=$2; shift 2;;
+		-d) BMTAGGER_DB=$2; shift 2;;
 		-h | --help) help_message; exit 1; shift 1;;
 		--skip-trimming) trim=false; shift 1;;
 		--skip-bmtagger) bmtagger=false; shift 1;;

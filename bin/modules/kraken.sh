@@ -22,7 +22,9 @@ help_message () {
 	echo ""
 	echo "	-o STR          output directory"
 	echo "	-t INT          number of threads"
-	echo "	-s INT		read subsampling number (default=all)"
+	echo "	-s INT					read subsampling number (default=all)"
+	echo "	-d STR    			directory path for kraken database"
+	echo ""
 	echo "	--no-preload	do not pre-load the kraken DB into memory (slower, but lower memory requirement)"
 	echo ""
 	echo "	Note: you may pass any number of sequence files with the following extensions:"
@@ -43,20 +45,8 @@ help_message () {
 	echo "======================================="
 	echo ""
 
-	# config_file will be in the base directory
-	# config_file will be in the base directory
-	if [ ! -z "$CONFIG" ]; then
-	  source $CONFIG
-	  echo "Config file sourced: $CONFIG"
-	else
-	  source $DIR/config-metawrap
-	  echo "Config file sourced: $DIR/config-metawrap"
-	fi
-
-	if [[ $? -ne 0 ]]; then
-		echo "cannot find config-metawrap file - something went wrong with the installation!"
-		exit 1
-	fi
+	SOFT = ./scripts
+	PIPES = ./modules
 
 	echo "Scripts sourced from: $SOFT"
 	echo "Modules sourced from: $PIPES"
@@ -66,17 +56,18 @@ threads=1; out="false"; depth="all"; preload=true
 
 
 # load in params
-# OPTS=`getopt -o ht:o:s: --long help,no-preload,config-metawrap -- "$@"`
+OPTS=`getopt -o ht:o:s:d: --long help,no-preload -- "$@"`
+
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
 # loop through input params
 while true; do
 	case "$1" in
-		--config-metawrap) shift 2;;
 		-t) threads=$2; shift 2;;
 		-o) out=$2; shift 2;;
 		-s) depth=$2; shift 2;;
+		-d) KRAKEN_DB=$2; shift 2;;
 		-h | --help) help_message; exit 1; shift 1;;
 		--no-preload) preload=false; shift 1;;
 		--) help_message; exit 1; shift; break ;;

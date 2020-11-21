@@ -17,9 +17,10 @@ help_message () {
 	echo "Usage: metaWRAP blobology [options] -a assembly.fasta -o output_dir readsA_1.fastq readsA_2.fastq [readsB_1.fastq readsB_2.fastq ... ]"
 	echo "Options:"
 	echo ""
-	echo "	-a STR		assembly fasta file"
+	echo "	-a STR					assembly fasta file"
 	echo "	-o STR          output directory"
 	echo "	-t INT          number of threads"
+	echo " 	-x STR					path to NCBI taxonomy database (TAXDUMP; dmp file)"
 	echo ""
 	echo "	--subsamble 	INT	Number of contigs to run blobology on. Subsampling is randomized. (default=ALL)"
 	echo "	--bins		STR	Folder containing bins. Contig names must match those of the assembly file. (default=None)"
@@ -39,20 +40,8 @@ help_message () {
 	echo "======================================="
 	echo ""
 
-	# config_file will be in the base directory
-	# config_file will be in the base directory
-	if [ ! -z "$CONFIG" ]; then
-	  source $CONFIG
-	  echo "Config file sourced: $CONFIG"
-	else
-	  source $DIR/config-metawrap
-	  echo "Config file sourced: $DIR/config-metawrap"
-	fi
-
-	if [[ $? -ne 0 ]]; then
-		echo "cannot find config-metawrap file - something went wrong with the installation!"
-		exit 1
-	fi
+	SOFT = ./scripts
+	PIPES = ./modules
 
 	echo "Scripts sourced from: $SOFT"
 	echo "Modules sourced from: $PIPES"
@@ -62,17 +51,18 @@ threads=1; out="false"; n_contigs="false";
 ASSEMBLY="false"; bin_folder=false
 
 # load in params
-# OPTS=`getopt -o ht:o:a: --long help,bins,subsample,config-metawrap -- "$@"`
+OPTS=`getopt -o ht:o:a: --long help,bins,subsample -- "$@"`
+
 # make sure the params are entered correctly
 if [ $? -ne 0 ]; then help_message; exit 1; fi
 
 # loop through input params
 while true; do
         case "$1" in
-								--config-metawrap) shift 2;;
                 -t) threads=$2; shift 2;;
                 -o) out=$2; shift 2;;
                 -a) ASSEMBLY=$2; shift 2;;
+								-x) TAXDUMP=$2; shift 2;;
                 -h | --help) help_message; exit 1; shift 1;;
                 --bins) bin_folder=$2; shift 2;;
                 --subsample) n_contigs=$2; shift 2;;
