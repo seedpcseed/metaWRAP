@@ -18,7 +18,8 @@ help_message () {
 	echo "	-2 STR          reverse fastq reads"
 	echo "	-o STR          output directory"
 	echo "	-t INT          number of threads (default=1)"
-	echo "	-x STR					prefix of host index in bmtagger database folder (default=hg38)"
+	echo "	-x STR          prefix of host index in bmtagger"
+	echo "                  database folder (default=hg38)"
 	echo "  -d STR          folder path for bmtagger databsase"
 	echo ""
 	echo "	--skip-bmtagger		dont remove human sequences with bmtagger"
@@ -41,8 +42,8 @@ echo "Running read_qc ${@:1}"
 echo "======================================="
 echo ""
 
-SOFT = ./scripts
-PIPES = ./modules
+SOFT="./scripts"
+PIPES="./modules"
 
 # default params
 threads=1; out="false"; reads_1="false"; reads_2="false"

@@ -29,23 +29,13 @@ help_message () {
 	echo "	--show-config	show where the metawrap configuration files are stored"
         echo "";}
 
+SOFT="./scripts"
+PIPES="./modules"
 
-# config_file will be in the base directory
-if [ ! -z "$CONFIG" ]; then
-  source $CONFIG
-  echo "Config file sourced from launch: $CONFIG"
-else
-  source /opt/conda/bin/config-metawrap
-  echo "Config file sourced from container: /opt/conda/bin/config-metawrap"
-fi
-
-if [[ $? -ne 0 ]]; then
-	echo "cannot find config-metawrap file - something went wrong with the installation!"
-	exit 1
-fi
-
+echo ""
 echo "Scripts sourced from: $SOFT"
 echo "Modules sourced from: $PIPES"
+echo ""
 
 #comm () { ${SOFT}/print_comment.py "$1" "-"; }
 comm () { ${SOFT}/print_comment.py "$1" "-"; }
@@ -106,9 +96,9 @@ elif [ "$1" = "-v" ] || [ "$1" = "--version" ]; then
 	echo "metaWRAP v=$VERSION"
 	echo ""
 elif [ "$1" = "--show-config" ]; then
-	comm "MetaWRAP script found in $(which metawrap) and config-metawrap file was found in $(which config-metawrap). Please make sure these paths are consistent with each other."
-	comm "Here are the contents of config-metawrap:"
-	cat $(which config-metawrap)
+	comm "Metawrap Verion $VERSION"
+  comm "Scripts in: $SOFT"
+  comm "Modules in: $PIPES"
 else
         comm "Please select a proper module of metaWRAP."
         help_message

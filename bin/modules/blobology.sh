@@ -40,8 +40,8 @@ help_message () {
 	echo "======================================="
 	echo ""
 
-	SOFT = ./scripts
-	PIPES = ./modules
+	SOFT="./scripts"
+	PIPES="./modules"
 
 	echo "Scripts sourced from: $SOFT"
 	echo "Modules sourced from: $PIPES"
