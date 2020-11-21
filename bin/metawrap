@@ -29,8 +29,8 @@ help_message () {
 	echo "	--show-config	show where the metawrap configuration files are stored"
         echo "";}
 
-SOFT="./scripts"
-PIPES="./modules"
+SOFT="${PWD}/scripts"
+PIPES="${PWD}/modules"
 
 echo ""
 echo "Scripts sourced from: $SOFT"

@@ -42,8 +42,8 @@ echo "Running read_qc ${@:1}"
 echo "======================================="
 echo ""
 
-SOFT="./scripts"
-PIPES="./modules"
+SOFT="${PWD}/scripts"
+PIPES="${PWD}/modules"
 
 # default params
 threads=1; out="false"; reads_1="false"; reads_2="false"
