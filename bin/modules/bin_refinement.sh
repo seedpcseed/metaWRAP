@@ -34,10 +34,10 @@ help_message () {
 	echo "	--quick			adds --reduced_tree option to checkm, reducing runtime, especially with low memory"
 	echo "";}
 
-	comm () { ${PWD}/metawrap-scripts/print_comment.py "$1" "-"; }
-	error () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; exit 1; }
-	warning () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; }
-	announcement () { ${PWD}/metawrap-scripts/print_comment.py "$1" "#"; }
+	comm () { ${SOFT}/print_comment.py "$1" "-"; }
+	error () { ${SOFT}/print_comment.py "$1" "*"; exit 1; }
+	warning () { ${SOFT}/print_comment.py "$1" "*"; }
+	announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
 # runs CheckM mini-pipeline on a single folder of bins
 run_checkm () {

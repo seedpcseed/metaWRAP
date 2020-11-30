@@ -41,10 +41,11 @@ help_message () {
 	echo "	--single-end		non-paired reads mode (provide *.fastq files)"
 	echo "	--interleaved		the input read files contain interleaved paired-end reads"
 	echo "";}
-	comm () { ${PWD}/metawrap-scripts/print_comment.py "$1" "-"; }
-	error () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; exit 1; }
-	warning () { ${PWD}/metawrap-scripts/print_comment.py "$1" "*"; }
-	announcement () { ${PWD}/metawrap-scripts/print_comment.py "$1" "#"; }
+
+	comm () { ${SOFT}/print_comment.py "$1" "-"; }
+	error () { ${SOFT}/print_comment.py "$1" "*"; exit 1; }
+	warning () { ${SOFT}/print_comment.py "$1" "*"; }
+	announcement () { ${SOFT}/print_comment.py "$1" "#"; }
 
 run_checkm () {
 	comm "Running CheckM on ${1} bins"
