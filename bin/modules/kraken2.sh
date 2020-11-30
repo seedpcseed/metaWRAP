@@ -86,7 +86,7 @@ fi
 
 # Checks for correctly configures meta-scripts folder
 if [ ! -s $SOFT/sort_contigs.py ]; then
-	error "The folder $SOFT doesnt exist. Please make sure the meta-scriptss folder is in the same folder as the other reads_qc"
+	error "The folder $SOFT doesnt exist. Please make sure the scripts folder is in the same folder as the other reads_qc"
 fi
 
 # Checks for KRAKEN database
